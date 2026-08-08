@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>子育て移住 計画都市パンフレット</title>
+<style>
+  :root {
+    --navy:#1F3B4D; --accent:#E8735C; --bg:#F7F4EE; --line:#D8D2C4;
+    --grey:#6B6B6B; --dark:#333333; --dark2:#444444; --area:#2E7D6B;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin:0; padding:24px; background:#e9e4d8;
+    font-family: "Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+    color: var(--dark);
+  }
+  .page {
+    width: 100%; max-width: 210mm; min-height: 297mm; margin: 0 auto 32px auto;
+    background: var(--bg); box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    padding: 14mm 16mm 12mm 16mm; position: relative;
+  }
+  .header {
+    display:flex; align-items:center; gap:18px;
+    background: linear-gradient(135deg, var(--navy), #142834); margin: -14mm -16mm 0 -16mm; padding: 10mm 16mm;
+    border-bottom: 3px solid var(--accent);
+  }
+  .badge {
+    flex: 0 0 auto; width:72px; height:72px; border-radius:50%;
+    background: var(--accent); color:#fff; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; font-weight:700;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.15);
+  }
+  .badge-label { font-size:12px; }
+  .badge-rank { font-size:20px; }
+  .title-block { flex: 1 1 auto; color:#fff; }
+  .title-block h1 { margin:0 0 6px 0; font-size:26px; }
+  .subtitle { font-size:13px; color:#D8DEE4; }
+  .score-box {
+    flex: 0 0 auto; background:#fff; border-radius:8px; padding:10px 22px;
+    text-align:center; min-width:150px;
+  }
+  .score-box-label { font-size:11px; color:var(--navy); }
+  .score-box-value { font-size:26px; font-weight:700; color:var(--accent); margin-top:4px; }
+
+  .section-title { font-size:15px; color:var(--navy); margin:20px 0 8px 0; }
+  .summary { font-size:13.5px; line-height:1.8; color:var(--dark); margin:0 0 6px 0; }
+
+  .formula-box {
+    background:#fff; border:1px solid var(--line); border-radius:6px; padding:12px 16px;
+    font-size:13px; font-weight:700; color:var(--navy); margin:4px 0 14px 0; text-align:center;
+  }
+  .axis-grid { display:flex; gap:10px; margin:0 0 6px 0; flex-wrap:wrap; }
+  .axis-card { flex:1; min-width:150px; background:#fff; border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
+  .axis-title { font-weight:700; font-size:11.5px; color:var(--navy); }
+  .axis-weight { color:var(--accent); font-weight:700; }
+  .axis-desc { font-size:10px; color:var(--dark2); margin-top:5px; line-height:1.5; }
+
+  .rank-table { width:100%; border-collapse:collapse; margin:4px 0 6px 0; font-size:11.5px; }
+  .rank-table th { text-align:left; color:#fff; background:var(--navy); padding:7px 9px; font-weight:700; }
+  .rank-table td { padding:7px 9px; border-bottom:1px solid var(--line); }
+  .rank-table tr:nth-child(even) td { background:#F2EEE3; }
+  .rank-cell { font-weight:700; color:var(--accent); white-space:nowrap; }
+  .name-cell { font-weight:700; color:var(--navy); }
+  .score-cell { font-weight:700; color:var(--navy); white-space:nowrap; min-width:100px; }
+  .flag-cell { font-size:10px; }
+  .mini-bar-row { display:flex; align-items:center; gap:8px; }
+  .mini-bar-track { flex:1; background:#E7E2D6; border-radius:4px; height:6px; overflow:hidden; min-width:44px; }
+  .mini-bar-fill { background:var(--accent); height:100%; border-radius:4px; }
+
+  .score-cards { display:flex; gap:10px; margin:14px 0 6px 0; flex-wrap:wrap; }
+  .score-card {
+    flex:1; min-width:140px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:11px 13px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .score-title { font-weight:700; font-size:11.5px; color:var(--navy); margin-bottom:6px; }
+  .score-body { font-size:10.5px; color:var(--dark2); margin-top:6px; line-height:1.5; }
+  .bar-track { background:#E7E2D6; border-radius:5px; height:8px; overflow:hidden; }
+  .bar-fill { background:var(--accent); height:100%; border-radius:5px; }
+
+  .detail-block { background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+  .detail-label { font-weight:700; font-size:11.5px; color:var(--navy); margin-bottom:5px; }
+  .detail-text { font-size:11.5px; color:var(--dark2); line-height:1.7; }
+  .detail-text a { color:var(--area); text-decoration:none; font-size:10px; margin-left:4px; }
+  .detail-text a:hover { text-decoration:underline; }
+
+  .verdict-box {
+    background: linear-gradient(135deg, #F4E9DE, #F7F1E6); border:1px solid var(--accent); border-radius:8px;
+    padding:12px 16px; margin:14px 0 6px 0;
+  }
+  .verdict-label { font-weight:700; font-size:11px; color:var(--accent); margin-bottom:5px; }
+  .verdict-text { font-size:12.5px; color:var(--navy); line-height:1.7; font-weight:600; }
+
+  .map-open {
+    display:inline-flex; align-items:center; font-size:11.5px; font-weight:700;
+    color:#fff; background:var(--area); text-decoration:none; padding:6px 14px; border-radius:20px; margin-top:6px;
+  }
+  .map-open:hover { opacity:0.88; }
+
+  .footer { margin-top:16px; padding-top:8px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-end; gap:12px; }
+  .sources { font-size:9.5px; color:var(--grey); line-height:1.5; }
+  .pageno { font-size:10.5px; color:var(--grey); white-space:nowrap; }
+  .warn-tag { display:inline-block; background:#B5432E; color:#fff; font-size:9.5px; font-weight:700;
+    padding:2px 7px; border-radius:10px; margin-left:6px; vertical-align:middle; }
+
+  @media (max-width: 700px) {
+    body { padding:8px; }
+    .page { min-height:auto; padding:5mm 4mm 4mm 4mm; margin:0 auto 16px auto; border-radius:4px; }
+    .header { flex-wrap:wrap; margin:-5mm -4mm 0 -4mm; padding:4mm; gap:10px; }
+    .badge { width:56px; height:56px; }
+    .badge-label { font-size:10px; }
+    .badge-rank { font-size:16px; }
+    .title-block h1 { font-size:19px; }
+    .subtitle { font-size:11.5px; }
+    .score-box { min-width:0; padding:8px 14px; }
+    .score-box-value { font-size:20px; }
+    .rank-table { display:block; overflow-x:auto; white-space:nowrap; }
+    .footer { flex-direction:column; align-items:flex-start; gap:6px; }
+  }
+
+  @media print {
+    body { background:#fff; padding:0; }
+    .page { box-shadow:none; margin:0; page-break-after: always; width:auto; max-width:none; min-height:auto; }
+  }
+</style>
+</head>
+<body>
+
+  <section class="page overview-page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>子育て移住 計画都市パンフレット</h1>
+        <div class="subtitle">計画整備エリア・計画都市 15地区の紹介／候補駅評価スコアリング（保育・子育てコミュニティ重視）の結果より</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">対象</div>
+        <div class="score-box-value" style="font-size:18px;">計画整備<br>エリア15地区</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ このパンフレットについて</h2>
+    <p class="summary">首都圏の子育て移住先候補調査（全129件：候補駅114駅＋計画整備エリア追加調査15地区）のうち、区画整理・大規模再開発・官民連携などにより「計画的に整備されたファミリー向けの街」（評価条件#29に該当する地区）である15地区をまとめたパンフレットです。多少家賃や通勤時間の条件を妥協しても、整備された住環境・子育てコミュニティに住むことにベネフィットを感じる、という方針を踏まえた重み付けスコアで並べています。駅別114駅（通勤40分以内が原則）とは別枠の調査で、通勤許容ラインを片道60分程度まで緩和して調査しています。加えて、各地区の「街並みの美しさ・おしゃれ度」と「2LDK物件の供給量（掲載件数）」をそれぞれ追加調査し、参考情報として掲載しています（いずれも22点満点のスコアには含まれません）。家賃が安くても物件供給が少なければ実際には選びにくいため、家賃相場とあわせて確認することを推奨します。</p>
+
+    <h2 class="section-title">■ スコアの根拠（重み付けの考え方）</h2>
+    <p class="summary">「保育所充実度」と「子育てコミュニティ施策（＝計画的な街づくり・ファミリー向け地域整備度）」の重みを2倍にし、「家賃適合度」「通勤時間」の重みは通常の1倍に抑えた重み付けスコアリングです。</p>
+    <div class="formula-box">スコア = 保育所充実度 ×2 ＋ 子育てコミュニティ施策 ×2 ＋ 家賃適合度 ×1 ＋ 通勤時間 ×1　（22点満点）</div>
+
+    <div class="axis-grid">
+        <div class="axis-card">
+          <div class="axis-title">保育所充実度 <span class="axis-weight">×2</span></div>
+          <div class="axis-desc">待機児童数・保育施設数など、保育インフラの充実度。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">子育てコミュニティ施策 <span class="axis-weight">×2</span></div>
+          <div class="axis-desc">区画整理・再開発等による計画的なファミリー向け街づくり、官民連携の子育てコミュニティ形成の取り組み。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">家賃適合度 <span class="axis-weight">×1（参考）</span></div>
+          <div class="axis-desc">2LDK以上の家賃相場が予算（〜25万円）に収まるか。電車通勤前提のため、駅徒歩15分以内の物件を基準に判定（一部地区はLIFULL HOME'S「駅徒歩10分以内の2LDK平均」データで再検証済み）。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">通勤時間 <span class="axis-weight">×1（参考）</span></div>
+          <div class="axis-desc">新木場駅・田町駅への通勤時間（許容ドアドア1時間、通勤許容ラインは60分程度まで緩和）。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">街並みの美しさ・おしゃれ度 <span class="axis-weight">スコア外・参考</span></div>
+          <div class="axis-desc">Web上の評判・記事をもとに追加調査した参考指標。22点満点のスコアには含まれず、順位には影響しません。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">物件供給量（2LDK） <span class="axis-weight">スコア外・参考</span></div>
+          <div class="axis-desc">家賃が安くても物件数が少なければ選べないため追加。LIFULL HOME'S掲載の2LDK建物数・総物件数を参考値として掲載（駅ごとの検索結果、駅徒歩15分限定ではありません）。22点満点のスコアには含まれません。</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 15地区ランキング</h2>
+    <table class="rank-table">
+      <thead>
+        <tr><th>順位</th><th>地区</th><th>所在</th><th>代表駅・沿線</th><th>スコア</th><th>街並み<br>おしゃれ度</th><th>物件供給量<br>（2LDK）</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank-cell">1位</td>
+          <td class="name-cell">流山おおたかの森</td>
+          <td>千葉県流山市</td>
+          <td>流山おおたかの森駅（つくばエクスプレス／東武アーバンパークライン）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>22 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 633棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">2位</td>
+          <td class="name-cell">千葉ニュータウン中央<span class="warn-tag">要注意</span></td>
+          <td>千葉県印西市</td>
+          <td>千葉ニュータウン中央駅（北総線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>19 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">○</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">△ 31棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">3位</td>
+          <td class="name-cell">印西牧の原<span class="warn-tag">要注意</span></td>
+          <td>千葉県印西市</td>
+          <td>印西牧の原駅（北総線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>19 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">× 19棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">4位</td>
+          <td class="name-cell">たまプラーザ</td>
+          <td>神奈川県横浜市青葉区</td>
+          <td>たまプラーザ駅（東急田園都市線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>19 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 335棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">5位</td>
+          <td class="name-cell">新百合ヶ丘</td>
+          <td>神奈川県川崎市麻生区</td>
+          <td>新百合ヶ丘駅（小田急小田原線・多摩線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>19 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 193棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">6位</td>
+          <td class="name-cell">柏の葉キャンパス</td>
+          <td>千葉県柏市</td>
+          <td>柏の葉キャンパス駅（つくばエクスプレス）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>19 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 438棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">7位</td>
+          <td class="name-cell">海浜幕張ベイタウン</td>
+          <td>千葉県千葉市美浜区</td>
+          <td>海浜幕張駅（JR京葉線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>19 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:86%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">○ 92棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">8位</td>
+          <td class="name-cell">センター北<span class="warn-tag">要注意</span></td>
+          <td>神奈川県横浜市都筑区</td>
+          <td>センター北駅（横浜市営地下鉄ブルーライン・グリーンライン）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>18 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:82%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 230棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">9位</td>
+          <td class="name-cell">センター南<span class="warn-tag">要注意</span></td>
+          <td>神奈川県横浜市都筑区</td>
+          <td>センター南駅（横浜市営地下鉄ブルーライン・グリーンライン）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>18 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:82%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">○</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 204棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">10位</td>
+          <td class="name-cell">ユーカリが丘<span class="warn-tag">要注意</span></td>
+          <td>千葉県佐倉市</td>
+          <td>ユーカリが丘駅（京成本線／山万ユーカリが丘線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>17 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:77%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">○</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">△ 25棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">11位</td>
+          <td class="name-cell">多摩センター（参考）<span class="warn-tag">要注意</span></td>
+          <td>東京都多摩市</td>
+          <td>多摩センター駅（京王相模原線・小田急多摩線・多摩都市モノレール）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>17 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:77%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">○</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">○ 77棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">12位</td>
+          <td class="name-cell">あざみ野</td>
+          <td>神奈川県横浜市青葉区</td>
+          <td>あざみ野駅（東急田園都市線・横浜市営地下鉄）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>17 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:77%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 377棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">13位</td>
+          <td class="name-cell">南町田グランベリーパーク<span class="warn-tag">要注意</span></td>
+          <td>東京都町田市</td>
+          <td>南町田グランベリーパーク駅（東急田園都市線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>16 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:73%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">○ 83棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">14位</td>
+          <td class="name-cell">二子玉川<span class="warn-tag">要注意</span></td>
+          <td>東京都世田谷区</td>
+          <td>二子玉川駅（東急田園都市線・大井町線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>15 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:68%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 316棟</td>
+        </tr>
+        <tr>
+          <td class="rank-cell">15位</td>
+          <td class="name-cell">みなとみらい<span class="warn-tag">要注意</span></td>
+          <td>神奈川県横浜市西区</td>
+          <td>みなとみらい駅（横浜高速鉄道みなとみらい線）</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>12 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:55%"></div></div>
+            </div>
+          </td>
+          <td class="style-cell" style="text-align:center; font-size:15px;" title="街並みの美しさ・おしゃれ度（参考）">◎</td>
+          <td class="style-cell" style="text-align:center; font-size:11px;" title="物件供給量（2LDK・参考）">◎ 267棟</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="summary" style="font-size:11px; color:var(--grey);">「要注意」タグは、片道60分の通勤許容ラインを超過する可能性が高い、駅徒歩15分以内の家賃相場が予算25万円を大幅に超える、物件供給量が少ない（×）、または参考評価に留まる地区です。二子玉川・みなとみらいは、駅近物件の家賃再調査（LIFULL HOME'S「駅徒歩10分以内2LDK平均」）により予算超過が判明し、順位を下げています。印西牧の原は家賃は割安ですが、2LDK掲載物件数が19棟と15地区中最も少なく、選べる物件の幅が狭い点に注意してください（ユーカリが丘・千葉ニュータウン中央も20〜30棟台とやや少なめです）。</p>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート／スコアリング（計画整備・保育重視）シート）</div>
+      <div class="pageno">1/16　子育て移住 計画都市パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">1位</span></div>
+      <div class="title-block">
+        <h1>流山おおたかの森</h1>
+        <div class="subtitle">千葉県流山市　｜　流山おおたかの森駅（つくばエクスプレス／東武アーバンパークライン）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">22 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">通勤時間・保育・コミュニティ施策のバランスが最も良く、追加調査14地区の中で最有力候補の一つ。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約16.0万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可（余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">条件内（田町はルートにより変動）</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物633棟／総2652件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約51分〜1時間12分（乗換1〜2回）／新木場まで約46分（乗換1回）。ドアドアなら田町65分程度、新木場60分程度。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">待機児童0人（令和6年4月時点）。保育施設117カ所。駅前2カ所（おおたかの森・南流山）に「送迎保育ステーション」を設置し利便性を確保。<a href="https://www.city.nagareyama.chiba.jp/life/1001107/1001162/index.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">「母になるなら、流山市。父になるなら、流山市。」のシティプロモーションで子育て世代の転入を牽引、人口増加率が全国トップクラス。令和7年3月策定「流山市こども計画」で体系的に施策を推進。<a href="https://www.city.nagareyama.chiba.jp/_res/projects/default_project/_page_/001/048/856/keikaku.pdf" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　区画整理事業（2019年完了）により生まれた新しい街並みで、「おしゃれで洗練された街並み」「街並みが新しくてキレイ」との評判が多い。緑地保全にも配慮され、市も「都心から一番近い森のまち」を掲げる。<a href="https://www.athome.co.jp/town-library/article/122752/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約16.0万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可（余裕あり）　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/chiba/nagareyamaotakanomori_09938-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 633棟／総物件数 2652件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/chiba/nagareyamaotakanomori_09938-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E6%B5%81%E5%B1%B1%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E9%A7%85" target="_blank" rel="noopener">流山おおたかの森駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">2/16　子育て移住 計画都市パンフレット　｜　流山おおたかの森</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">2位</span></div>
+      <div class="title-block">
+        <h1>千葉ニュータウン中央<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">千葉県印西市　｜　千葉ニュータウン中央駅（北総線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">19 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】家賃・保育環境は追加調査地区中で最も優秀だが、田町へは60分を大きく超過（70分超）。新木場なら53分で好条件のため新木場出社中心なら検討余地あり。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約9.5万円前後（可（大幅に余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">新木場は条件内、田町は大幅超過</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">△ やや少ない（建物31棟／総58件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約1時間8分（乗換2回）／新木場まで約53分（乗換1回）。ドアドアなら田町80分超、新木場70分弱。出典：Yahoo!路線情報 https://transit.yahoo.co.jp/search/result?from=千葉ニュータウン中央&amp;to=田町(東京都)&amp;all=1&amp;s=2&amp;ws=3&amp;expkind=1&amp;ticket=ic</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">印西市は待機児童0人（令和7年4月1日）、申込者3,650人／利用者3,579人（充足率1.02倍）で全国815市区中1位タイ。市内共通データ。<a href="https://www.seikatsu-guide.com/keyword/2100/12/12231/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">1967年着手・2014年完了の大規模区画整理事業で17街区に「1街区1小学校・2街区1中学校」を基本配置。車道と歩道を分離した設計、「子育てコンシェルジュ」相談体制。千葉ニュータウン事業全体（印西市内複数駅にまたがる）の取り組み。<a href="https://www.pref.chiba.lg.jp/kigyou/nt/jigyougaiyou.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 良好　区画整理による計画的で整然とした街並み。イオンモール等の商業機能が中心で、機能性重視の洗練さはあるが、突出した「おしゃれ」評判は目立たない。<a href="https://town.ietan.jp/ie-chibanewtown/65" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約9.5万円前後／可（大幅に余裕あり）　SUUMO 千葉ニュータウン中央駅家賃相場<a href="https://suumo.jp/chintai/soba/chiba/ek_24230/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">△ やや少ない　LIFULL HOME'Sの2LDK条件での検索結果：建物数 31棟／総物件数 58件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/chiba/chibanewtownchuo_07749-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E5%8D%B0%E8%A5%BF%E5%B8%82%E5%8D%83%E8%91%89%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%BF%E3%82%A6%E3%83%B3%E4%B8%AD%E5%A4%AE%E9%A7%85" target="_blank" rel="noopener">千葉ニュータウン中央駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">3/16　子育て移住 計画都市パンフレット　｜　千葉ニュータウン中央</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">3位</span></div>
+      <div class="title-block">
+        <h1>印西牧の原<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">千葉県印西市　｜　印西牧の原駅（北総線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">19 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】家賃・保育環境は良好だが、田町へは60分を大きく超過。新木場方面の所要時間は個別確認が必要（千葉ニュータウン中央駅の実測値53分を参考値として想定）。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約10.4万円前後（可（大幅に余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">田町は大幅超過（新木場は推定・要確認）</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">× 少ない（要注意）（建物19棟／総37件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約1時間12分（乗換1回）。ドアドアなら80分超。新木場までの直接データは未取得（千葉ニュータウン中央駅の隣駅のため、同程度〜やや長い55〜60分程度と推定、要個別確認）。出典：ジョルダン https://www.jorudan.co.jp/norikae/route/印西牧の原_田町（東京）.html</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">印西市共通データ（千葉ニュータウン中央と同一市）。待機児童0人（令和7年4月1日）、充足率1.02倍で全国815市区中1位タイ。<a href="https://www.seikatsu-guide.com/keyword/2100/12/12231/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">千葉ニュータウン事業（1967年着手・2014年完了、印西市内複数駅にまたがる大規模区画整理）による計画的なまちづくりの一部。千葉ニュータウン中央駅と同様の「1街区1小学校・2街区1中学校」設計・子育てコンシェルジュ体制の恩恵を受ける。<a href="https://www.pref.chiba.lg.jp/kigyou/nt/jigyougaiyou.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　「シムシティのような」と形容されるほど整然・統一感のある戸建て街並みが特徴。「美しい統一感のある街並み」と評される。<a href="https://town.ietan.jp/ie-chibanewtown/65" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約10.4万円前後／可（大幅に余裕あり）　Yahoo!不動産 印西牧の原駅家賃相場<a href="https://realestate.yahoo.co.jp/rent/price/03/12/r/2257/2496/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">× 少ない（要注意）　LIFULL HOME'Sの2LDK条件での検索結果：建物数 19棟／総物件数 37件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/chiba/inzaimakinohara_09557-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E5%8D%B0%E8%A5%BF%E5%B8%82%E5%8D%B0%E8%A5%BF%E7%89%A7%E3%81%AE%E5%8E%9F%E9%A7%85" target="_blank" rel="noopener">印西牧の原駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">4/16　子育て移住 計画都市パンフレット　｜　印西牧の原</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">4位</span></div>
+      <div class="title-block">
+        <h1>たまプラーザ</h1>
+        <div class="subtitle">神奈川県横浜市青葉区　｜　たまプラーザ駅（東急田園都市線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">19 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">通勤時間はほぼ60分以内。官民連携の子育てまちづくり実績が最も具体的・先進的で有力候補。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約18.9万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">ほぼ条件内</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物335棟／総1374件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約48〜54分（乗換1〜2回）／新木場まで約56分（乗換1回）。ドアドアなら60〜70分圏内。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">横浜市青葉区は令和6年4月1日時点で待機児童0人だが保留児童235人（18区中でも多い部類、施設90か所・定員5,335人）。<a href="https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/kodomo/2024/0515taiki060401.files/0006_20240514.pdf" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">2012年4月、東急電鉄と横浜市が「次世代郊外まちづくり」推進協定を締結、青葉区たまプラーザ駅北側地区をモデル地区に選定。産学官民連携の住宅地再生の全国的先進事例。2017年〜「子ども・子育てタウンミーティング」を経て「ファミリーリソースプロジェクト」発足。2022年第3期協定に更新。<a href="https://www.tokyu.co.jp/history/chapter08_3_3/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　「ロンドン郊外を模した高級住宅地」と評され、住みたい街ランキング上位の常連。緩やかな坂道・曲線道路など計画的な街並みが特徴で、「おしゃれなマダム文化」の象徴的存在。<a href="https://www.livable.co.jp/l-note/town/8096/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約18.9万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/kanagawa/tamaplaza_05103-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 335棟／総物件数 1374件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/kanagawa/tamaplaza_05103-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%9D%92%E8%91%89%E5%8C%BA%E3%81%9F%E3%81%BE%E3%83%97%E3%83%A9%E3%83%BC%E3%82%B6%E9%A7%85" target="_blank" rel="noopener">たまプラーザ駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">5/16　子育て移住 計画都市パンフレット　｜　たまプラーザ</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">5位</span></div>
+      <div class="title-block">
+        <h1>新百合ヶ丘</h1>
+        <div class="subtitle">神奈川県川崎市麻生区　｜　新百合ヶ丘駅（小田急小田原線・多摩線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">19 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">保育環境（待機児童ゼロ5年連続）は随一で家賃も手頃。通勤時間もほぼ許容範囲内でバランスの取れた候補。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約18.2万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">ほぼ条件内</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物193棟／総717件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約55分（乗換1回）／新木場まで推定56〜65分程度（未確認、要再確認）。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">川崎市は令和7年4月1日時点で市全体待機児童0人を5年連続達成。麻生区は市内7区中人口最少で保留児童も市内2番目に少なく比較的入園しやすい。<a href="https://www.city.kawasaki.jp/templates/prs/450/0000176653.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">1977年設立「新百合ヶ丘駅周辺土地区画整理組合」により1984年まで約46.4haの特定土地区画整理事業を実施、計画的な住宅地・都心機能を整備。地域子育て支援センター「ゆりの音」等も整備されるが港北NT・たまプラーザほど子育て特化の官民連携は確認できず。<a href="https://odapedia.org/archives/2039555.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　植栽・建物色彩の調和や屋外広告物規制が実り、1998年度「都市景観100選」に選定。並木道のマルシェ通りなどアートの街としての側面も。<a href="https://www.nomu.com/machikara/4150/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約18.2万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/kanagawa/shinyurigaoka_05007-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 193棟／総物件数 717件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/kanagawa/shinyurigaoka_05007-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E5%B7%9D%E5%B4%8E%E5%B8%82%E9%BA%BB%E7%94%9F%E5%8C%BA%E6%96%B0%E7%99%BE%E5%90%88%E3%83%B6%E4%B8%98%E9%A7%85" target="_blank" rel="noopener">新百合ヶ丘駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">6/16　子育て移住 計画都市パンフレット　｜　新百合ヶ丘</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">6位</span></div>
+      <div class="title-block">
+        <h1>柏の葉キャンパス</h1>
+        <div class="subtitle">千葉県柏市　｜　柏の葉キャンパス駅（つくばエクスプレス）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">19 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">通勤時間はほぼ60分以内で許容範囲。公民学連携による先進的な子育て支援インフラが特徴。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約21.7万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">ほぼ条件内</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物438棟／総2064件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約54分（乗換1回）／新木場まで約53〜55分（乗換1回）。ドアドアなら両駅とも70分弱。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">柏市は8年連続で国定義の待機児童数0人だが、入園保留児童は284人（令和7年4月、前年比38人増）。TX沿線新設園は比較的入りやすい傾向。<a href="https://www.city.kashiwa.lg.jp/hoikuunei/taikijidou.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">東大・千葉大・柏市・千葉県・三井不動産等が参画する公民学連携「柏の葉スマートシティ」（2019年国交省スマートシティモデル事業選定）。子育て支援拠点「はぐはぐひろば若柴」、パークシティ内に学童・病児保育・365日対応小児科を併設。<a href="https://www.city.kashiwa.lg.jp/keiei/shiseijoho/keikaku/machizukuri/kashiwanoha/index.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　ウッドデッキや植栽が整った歩行者にやさしい街づくりで、「整然とした現代的な美しさ」が特徴。国交省スマートシティモデル事業にも選定された先進的な景観。<a href="https://www.athome.co.jp/town-library/article/122958/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約21.7万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/chiba/kashiwanohacampus_09939-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 438棟／総物件数 2064件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/chiba/kashiwanohacampus_09939-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%9F%8F%E5%B8%82%E6%9F%8F%E3%81%AE%E8%91%89%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%91%E3%82%B9%E9%A7%85" target="_blank" rel="noopener">柏の葉キャンパス駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">7/16　子育て移住 計画都市パンフレット　｜　柏の葉キャンパス</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">7位</span></div>
+      <div class="title-block">
+        <h1>海浜幕張ベイタウン</h1>
+        <div class="subtitle">千葉県千葉市美浜区　｜　海浜幕張駅（JR京葉線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">19 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">田町へはやや60分超だが新木場なら40分程度と好条件。家賃・保育・コミュニティすべて水準が高く有力候補。（例示地区）</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約13〜15万円（可（大きく余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">新木場は条件内、田町はやや超過</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 標準的（建物92棟／総318件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約55分（乗換1回）／新木場まで約27分（乗換0回、京葉線直通）。ドアドアなら田町約70分、新木場約40分。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">千葉市全体で待機児童0人（令和8年4月1日現在）だが入所待ち児童673人。美浜区内に認可保育園・認定こども園多数（80件超）だが人気エリアで倍率はやや高め。<a href="https://www.city.chiba.jp/kodomomirai/yojikyoiku/unei/hoikusyotaikizidousuu.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">小中学校に塀・フェンス・制服がないオープンな街づくり、公園多数、住民主体「ベイタウンまつり」等、街開き当初からの住民参加型まちづくり組織「幕張ベイタウン・コア」が機能。<a href="https://baytown.chiba.jp/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　グッドデザイン賞受賞。電柱・電線がなく石畳のプロムナードが続く「ヨーロッパのような街並み」との評価が非常に多い。<a href="https://www.homes.co.jp/cont/rent/rent_urchintai025/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約13〜15万円／可（大きく余裕あり）　LIFULL HOME&#x27;S実例（パティオス7番街2LDK/67.23㎡=13.56万円）<a href="https://www.homes.co.jp/chintai/room/a6079322170758e61929036f939abf18100135cc/" target="_blank" rel="noopener">出典1</a><a href="https://suumo.jp/chintai/soba/chiba/ek_07530/" target="_blank" rel="noopener">出典2</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 標準的　LIFULL HOME'Sの2LDK条件での検索結果：建物数 92棟／総物件数 318件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/chiba/kaihimmakuhari_01987-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E5%8D%83%E8%91%89%E5%B8%82%E7%BE%8E%E6%B5%9C%E5%8C%BA%E6%B5%B7%E6%B5%9C%E5%B9%95%E5%BC%B5%E9%A7%85" target="_blank" rel="noopener">海浜幕張駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">8/16　子育て移住 計画都市パンフレット　｜　海浜幕張ベイタウン</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">8位</span></div>
+      <div class="title-block">
+        <h1>センター北<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">神奈川県横浜市都筑区　｜　センター北駅（横浜市営地下鉄ブルーライン・グリーンライン）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">18 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】計画的まちづくりの完成度は随一だが、新木場方面への通勤は推定70分超とみられ条件をやや超過する可能性が高い。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約19.4万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:33%"></div></div>
+          <div class="score-body">条件超過の可能性が高い</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物230棟／総786件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約60分（乗換1回）／新木場まで推定70〜75分程度（未確認）。ドアドアなら75〜90分の可能性。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">横浜市都筑区は待機児童0人、保留児童171人（18区中では少ない部類）、施設68か所。</div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">港北ニュータウンは1965年計画開始・1974年造成着手の半世紀に及ぶ計画的まちづくりの中心地。「グリーンマトリックスシステム」（住宅・公園・学校を緑道でネットワーク化し歩車分離を徹底）が全域に整備。<a href="https://www.city.yokohama.lg.jp/kurashi/machizukuri-kankyo/toshiseibi/jokyo/sonota/nertown/nt.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　港北ニュータウンの中核。歩車分離を徹底した「グリーンマトリックスシステム」により、自然を残しつつ計画的に整備された美しい街並みが評価されている。<a href="https://www.housing-messe.com/yell/live-rary/archives/5107" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約19.4万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/kanagawa/centerkita_08949-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 230棟／総物件数 786件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/kanagawa/centerkita_08949-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%E5%8C%97%E9%A7%85" target="_blank" rel="noopener">センター北駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">9/16　子育て移住 計画都市パンフレット　｜　センター北</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">9位</span></div>
+      <div class="title-block">
+        <h1>センター南<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">神奈川県横浜市都筑区　｜　センター南駅（横浜市営地下鉄ブルーライン・グリーンライン）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">18 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】行政サービスへのアクセスは随一だが、田町・新木場双方への通勤時間が14地区中最も長く、60分を超過する可能性が高い。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約14.6万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:33%"></div></div>
+          <div class="score-body">条件超過の可能性が高い</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物204棟／総630件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約58分〜1時間3分（乗換1〜2回）／新木場まで推定70〜78分程度（未確認）。ドアドアなら75〜90分の可能性。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">都筑区共通データ（待機0人、保留171人、施設68か所）。区役所もセンター南駅前に立地。</div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">港北ニュータウン計画区域内でグリーンマトリックスシステムの緑道・公園ネットワークを共有。1995年都筑区総合庁舎が駅前開設、1998年「港北TOKYU S.C.」等子育てファミリー向け商業施設も充実。</div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 良好　センター北と同じ港北ニュータウン計画区域内で緑道ネットワークを共有するが、区役所など行政機能中心のエリアで、商業・景観面ではセンター北ほど際立った評判は少ない。<a href="https://www.housing-messe.com/yell/live-rary/archives/5107" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約14.6万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/kanagawa/centerminami_08950-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 204棟／総物件数 630件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/kanagawa/centerminami_08950-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%83%BD%E7%AD%91%E5%8C%BA%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%E5%8D%97%E9%A7%85" target="_blank" rel="noopener">センター南駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">10/16　子育て移住 計画都市パンフレット　｜　センター南</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">10位</span></div>
+      <div class="title-block">
+        <h1>ユーカリが丘<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">千葉県佐倉市　｜　ユーカリが丘駅（京成本線／山万ユーカリが丘線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">17 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】家賃・保育・子育てコミュニティ施策はいずれも優秀だが、通勤時間が60分を大幅超過（75分以上）する可能性が高く、参考情報としての位置づけが妥当。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約9〜10万円（推定）（可（大幅に余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">条件超過（60分を大幅超過）</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">△ やや少ない（建物25棟／総77件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで概ね75〜80分程度と推定（東京駅まで1時間11分・乗換2回）／新木場も同程度〜それ以上と推測（未確認）。ドアドアなら90分前後の可能性。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">佐倉市待機児童0人（令和7年4月1日）、申込者2,634人／利用者2,554人（充足率1.03倍）。<a href="https://www.seikatsu-guide.com/keyword/2100/12/12231/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">山万株式会社が1971年から50年以上続ける「長期計画型まちづくり」。年間分譲戸数を約200戸に抑える成長管理型開発で世代の偏りを防止、2005年からの20年で年少人口が約140%増加。2002年「福祉の街」構想で学童・高齢者・障がい者施設等を集約整備。<a href="https://www.atpress.ne.jp/news/434751" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 良好　街全体を「共有の庭」と捉えるランドスケープ理念のもと、山万が50年以上手がける「長期計画型まちづくり」。堅実で緑豊かな街並みだが、「おしゃれ」を前面に押し出す評判は少なめ。<a href="https://realestate.yukarigaoka.jp/town/abouts/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約9〜10万円（推定）／可（大幅に余裕あり）　LIFULL HOME&#x27;S（2DK6.4万円・3LDK14万円等から按分）<a href="https://www.homes.co.jp/chintai/chiba/yukarigaoka_04901-st/price/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">△ やや少ない　LIFULL HOME'Sの2LDK条件での検索結果：建物数 25棟／総物件数 77件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/chiba/yukarigaoka_04901-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E4%BD%90%E5%80%89%E5%B8%82%E3%83%A6%E3%83%BC%E3%82%AB%E3%83%AA%E3%81%8C%E4%B8%98%E9%A7%85" target="_blank" rel="noopener">ユーカリが丘駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">11/16　子育て移住 計画都市パンフレット　｜　ユーカリが丘</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">11位</span></div>
+      <div class="title-block">
+        <h1>多摩センター（参考）<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">東京都多摩市　｜　多摩センター駅（京王相模原線・小田急多摩線・多摩都市モノレール）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">17 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意・参考評価】家賃・保育・計画的まちづくりはいずれも良好だが、通勤時間が60分を大幅超過（乗換2〜3回で77分〜1時間20分、ドアドア90分前後）し、通勤条件面では14地区中最も厳しい。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約11.6万円（可（大きく余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">条件を大幅超過</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 標準的（建物77棟／総284件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約1時間17分〜19分（乗換2〜3回）／新木場まで約1時間20分（乗換1回）。ドアドアで90分前後。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">多摩市の2025年新規入園決定率80.8%、待機児童2人、延長保育実施率100%。ただし保育定員はここ5年で1.6%減少傾向。認可保育所は市内22カ所。<a href="https://www.hokatsunomikata.com/taiki_infos/672" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">多摩ニュータウンは1965年計画決定・1971年入居開始の日本最大級の計画都市。保育所・学校・公園・病院・商業施設を駅周辺に計画的配置、市内127本の歩車分離歩道橋で子どもが車道を横切らず通園・通学できる設計。近年は老朽団地建替えで多世代共生・子育て世代呼び戻し施策も進行。<a href="https://www.city.tama.lg.jp/kurashi/machi/tamacenter/1011294/1013236.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 良好　サンリオピューロランドや歩車分離のペデストリアンデッキ、イルミネーション等で知られる緑豊かなニュータウン中心地。機能性・利便性の評価は高いが、「おしゃれ」というより「懐かしい大規模ニュータウン」のイメージが強い。<a href="https://www.rehouse.co.jp/relifemode/column/burarehouse/odakyu-tama-center/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約11.6万円／可（大きく余裕あり）　ホームメイト 京王多摩センター駅<a href="https://www.homemate.co.jp/soba/pr-tokyo/P11500522998/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 標準的　LIFULL HOME'Sの2LDK条件での検索結果：建物数 77棟／総物件数 284件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/tokyo/tamacenter_09931-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%A4%9A%E6%91%A9%E5%B8%82%E5%A4%9A%E6%91%A9%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC%E9%A7%85" target="_blank" rel="noopener">多摩センター駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">12/16　子育て移住 計画都市パンフレット　｜　多摩センター（参考）</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">12位</span></div>
+      <div class="title-block">
+        <h1>あざみ野</h1>
+        <div class="subtitle">神奈川県横浜市青葉区　｜　あざみ野駅（東急田園都市線・横浜市営地下鉄）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">17 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">家賃はもっとも安く青葉区の保育環境をたまプラーザと共有できるが、新木場への通勤は推定65分前後とやや長め。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約20.6万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（可（余裕はやや小さめ））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">田町は条件内、新木場はやや超過の可能性</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物377棟／総1221件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約52〜53分（乗換1〜2回）／新木場まで推定65分前後（直接データ未取得、要再確認）。ドアドアなら70〜80分の可能性。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">青葉区共通データ（待機0人、保留235人、施設90か所）。</div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">「次世代郊外まちづくり」モデル地区は隣接のたまプラーザ駅北側地区だが、2022年第3期協定以降は田園都市線沿線全体に取組が拡大。あざみ野固有の子育て特化プロジェクトは確認できず一般的な子育て支援に留まる。<a href="https://www.city.yokohama.lg.jp/kurashi/sumai-kurashi/jutaku/jizokukanoupj/tamapla-area.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　第一種低層住居専用地域が中心の閑静な高級住宅街。1953年から東急電鉄が手がけた街づくりで、緑豊かで統一感のある美しい街並みと評される。<a href="http://city.azamino.co.jp/keikan/index.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約20.6万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／可（余裕はやや小さめ）　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/kanagawa/azamino_05104-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 377棟／総物件数 1221件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/kanagawa/azamino_05104-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E9%9D%92%E8%91%89%E5%8C%BA%E3%81%82%E3%81%96%E3%81%BF%E9%87%8E%E9%A7%85" target="_blank" rel="noopener">あざみ野駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">13/16　子育て移住 計画都市パンフレット　｜　あざみ野</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">13位</span></div>
+      <div class="title-block">
+        <h1>南町田グランベリーパーク<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">東京都町田市　｜　南町田グランベリーパーク駅（東急田園都市線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">16 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】家賃は余裕を持って抑えられ公民連携型の子育てまちづくりは非常に特徴的だが、通勤時間が田町・新木場ともに60分を明確に超過する点がネック。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">△ やや厳しい</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約8〜13万円（可（余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:33%"></div></div>
+          <div class="score-body">条件超過（60分をやや〜大きく超過）</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">○ 標準的（建物83棟／総272件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約57分〜1時間4分（乗換1〜2回）／新木場まで約1時間6分（乗換1回）。ドアドアで田町約72〜79分、新木場約81分。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">町田市の2025年新規入園決定率76.3%（周辺平均81.1%より低い）、待機児童40人（前年28人から増加傾向、南地域に集中）。<a href="https://www.hokatsunomikata.com/taiki_infos/659" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">閉館「グランベリーモール」跡地と町田市立「鶴間公園」を一体再整備する「南町田拠点創出まちづくりプロジェクト」（町田市×東急の公民連携、2019年11月開業）。「まちのぜんぶがパークになる」がコンセプトで児童館「南町田子どもクラブつみき」等も整備。2020年度都市景観大賞（国土交通大臣賞）受賞。<a href="https://www.city.machida.tokyo.jp/kurashi/sumai/toshikei/ekisyuhenmachidukuri/minamimachidamachidukuri/index.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　駅・商業施設・鶴間公園を歩車分離でつなぐ「歩いて楽しいまち」が評価され、2020年度都市景観大賞（国土交通大臣賞）を受賞。庇や植栽、ガラス・タイルを使った建築意匠にもこだわりがある。<a href="https://erimane.com/report-grandberrypark/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約8〜13万円／可（余裕あり）　SUUMO 南町田グランベリーパーク駅<a href="https://suumo.jp/chintai/soba/tokyo/ek_37790/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">○ 標準的　LIFULL HOME'Sの2LDK条件での検索結果：建物数 83棟／総物件数 272件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/tokyo/minamimachidagrandberrypark_05112-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E7%94%BA%E7%94%B0%E5%B8%82%E5%8D%97%E7%94%BA%E7%94%B0%E3%82%B0%E3%83%A9%E3%83%B3%E3%83%99%E3%83%AA%E3%83%BC%E3%83%91%E3%83%BC%E3%82%AF%E9%A7%85" target="_blank" rel="noopener">南町田グランベリーパーク駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">14/16　子育て移住 計画都市パンフレット　｜　南町田グランベリーパーク</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">14位</span></div>
+      <div class="title-block">
+        <h1>二子玉川<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">東京都世田谷区　｜　二子玉川駅（東急田園都市線・大井町線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">15 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】駅徒歩10分以内の2LDK家賃相場を確認したところ平均34.9万円と判明し、当初想定（14〜20万円）から大幅に上振れした。予算25万円を大きく超えるため、駅近では家賃条件を満たさない。通勤時間・公民連携のエリアマネジメントによる子育てコミュニティ形成は魅力的だが、駅からやや離れた物件を探すか、候補として再検討が必要。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">△ やや厳しい</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">約34.9万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（不可（大幅に予算超過））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">条件内</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物316棟／総1600件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約29〜40分（乗換1回）／新木場まで約44分（乗換1回）。ドアドアでも田町約45分、新木場約59分でいずれも60分以内。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">世田谷区の2025年新規入園決定率71.3%（周辺平均79.7%を下回る）、待機児童47人。23区内で「入りにくい自治体」の一つ。ただし2025年9月から認可保育園保育料が所得・年齢問わず無償化。<a href="https://www.hokatsunomikata.com/taiki_infos/639" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">「二子玉川ライズ」は約200名の地元権利者との合意形成を経た再開発（2010年オークモール開業、2015年第二地区竣工）。2015年4月に東急・玉川町会・世田谷区による「二子玉川エリアマネジメンツ」発足、公民連携でイベント・地域コミュニティ形成を継続。<a href="https://www.rise.sc/whatsrise/history/" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　多摩川の自然と都市機能が融合した「自然と共存するおしゃれな街」。二子玉川ライズ周辺にカフェ・アートショップが集まり、「子育てとおしゃれを楽しめる街」と評される。<a href="https://o-uccino.com/front/articles/48590" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約34.9万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／不可（大幅に予算超過）　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/tokyo/futakotamagawa_05090-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 316棟／総物件数 1600件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/tokyo/futakotamagawa_05090-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E4%B8%96%E7%94%B0%E8%B0%B7%E5%8C%BA%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E9%A7%85" target="_blank" rel="noopener">二子玉川駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">15/16　子育て移住 計画都市パンフレット　｜　二子玉川</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">15地区中</span><span class="badge-rank">15位</span></div>
+      <div class="title-block">
+        <h1>みなとみらい<span class="warn-tag">要注意</span></h1>
+        <div class="subtitle">神奈川県横浜市西区　｜　みなとみらい駅（横浜高速鉄道みなとみらい線）</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">12 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 総合評価</h2>
+    <p class="summary">【要注意】駅徒歩10分以内の2LDK家賃相場は平均33.7万円で、当初想定（28〜30万円）よりさらに高く、予算25万円を大幅に超過することが確認された。新木場方面の通勤も大幅超過であり、通勤・家賃の両面で14地区中最も厳しい部類。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">○ 良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">約33.7万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）（不可（大幅に予算超過））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+          <div class="score-body">田町は条件内、新木場は大幅超過</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">街並み・おしゃれ度 <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 非常に良好</div>
+        </div>
+        <div class="score-card" style="border-color:var(--accent);">
+          <div class="score-title">物件供給量（2LDK） <span style="color:var(--grey); font-weight:400;">（参考）</span></div>
+          <div class="score-body">◎ 豊富（建物267棟／総993件）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 通勤時間の目安（田町／新木場）</h2>
+    <div class="detail-block">
+      <div class="detail-text">田町まで約32〜43分（乗換1〜2回）／新木場まで約1時間18分（乗換3回）。ドアドアで田町約50〜60分、新木場約90分超。</div>
+    </div>
+
+    <h2 class="section-title">■ 保育所充実度の根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">横浜市は2025年4月1日時点で12年ぶりに待機児童ゼロ達成（保留児童は市全体1,511人）。西区は就学前児童数が市内最少で定員に比較的余裕があるが0・1歳児クラスはほぼ空きなし。<a href="https://www.city.yokohama.lg.jp/city-info/koho-kocho/press/kodomo/2025/0507taiki070401.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 子育てコミュニティ施策・まちづくりの根拠</h2>
+    <div class="detail-block">
+      <div class="detail-text">1983年着工・1988年「みなとみらい21街づくり基本協定」締結の大規模計画都市。西区「地域子育て支援拠点 スマイル・ポート」あり、みなとみらいミッドスクエアに認可保育園も入居。二子玉川・南町田のような子育てファミリー誘致を前面に出した施策は確認できず。<a href="https://www.city.yokohama.lg.jp/kurashi/machizukuri-kankyo/toshiseibi/mm21/gaiyo.html" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 街並みの美しさ・おしゃれ度（参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 非常に良好　電柱・電線を地中化した都市景観で「横浜屈指の美しい街並み」と評される。ランドマークタワーや赤レンガ倉庫など、光り輝く夜景でも知られる。<a href="https://town.mec-h.com/mh-minatomirai/18" target="_blank" rel="noopener">出典</a></div>
+    </div>
+
+    <h2 class="section-title">■ 家賃相場（2LDK目安）</h2>
+    <div class="detail-block">
+      <div class="detail-text">約33.7万円（駅徒歩10分以内の2LDK平均・HOME&#x27;S調べ）／不可（大幅に予算超過）　駅徒歩15分以内（電車通勤）条件での再調査により、LIFULL HOME'S「駅徒歩10分以内の2LDK平均賃料」データで更新（より駅近側の保守的な基準で確認）。<a href="https://www.homes.co.jp/chintai/kanagawa/minatomirai_09864-st/price/" target="_blank">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <h2 class="section-title">■ 物件供給量（2LDK・参考・スコア外）</h2>
+    <div class="detail-block">
+      <div class="detail-text">◎ 豊富　LIFULL HOME'Sの2LDK条件での検索結果：建物数 267棟／総物件数 993件。家賃が安くても選べる物件数が少なければ実際の部屋探しは難しくなるため、参考指標として掲載しています。<a href="https://www.homes.co.jp/chintai/kanagawa/minatomirai_09864-st/list/?cond%5Bmadori%5D%5B25%5D=25" target="_blank" rel="noopener">出典：LIFULL HOME'S</a></div>
+    </div>
+
+    <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E6%A8%AA%E6%B5%9C%E5%B8%82%E8%A5%BF%E5%8C%BA%E3%81%BF%E3%81%AA%E3%81%A8%E3%81%BF%E3%82%89%E3%81%84%E9%A7%85" target="_blank" rel="noopener">みなとみらい駅 をGoogleマップで見る ↗</a>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx（計画整備エリア追加調査シート）</div>
+      <div class="pageno">16/16　子育て移住 計画都市パンフレット　｜　みなとみらい</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>調査条件・注記</h1>
+        <div class="subtitle">計画都市パンフレット　補足情報</div>
+      </div>
+    </div>
+    <h2 class="section-title">■ 調査対象について</h2>
+    <p class="summary">本シートは、前提情報の評価条件#29（子育て世帯向けの地域づくりへの取り組み）に該当する、計画的なファミリー居住空間の整備実績や官民連携の子育てコミュニティ形成で知られる地区を対象に追加調査したものです。「駅別評価」シートの40分圏（通勤片道40分以内）とは別枠の調査で、通勤時間の許容ラインは片道60分程度まで緩和しています。</p>
+    <h2 class="section-title">■ データの制限事項</h2>
+    <p class="summary">一部地区（ユーカリが丘、千葉ニュータウン中央、印西牧の原、センター北、センター南、南町田グランベリーパーク、多摩センター）はいずれかの駅（特に新木場方面）で60分を大きく超える可能性があり、「要注意」タグを付けています。新木場方面の所要時間は一部地区（あざみ野・センター北・センター南・新百合ヶ丘）で乗換案内サービスから確定データを取得できず推定値を含みます。移住検討時は実際の出発時刻での再検索を推奨します。除外リスト対象地区（船橋市、検見川浜、津田沼、新浦安、奏の杜、東雲）は前提情報に基づき今回も調査対象から除外しています。家賃相場は不動産ポータルの集計時点（2026年8月頃）のデータであり、実際の物件検索時は最新情報の確認を推奨します。「物件供給量」はLIFULL HOME'Sの各駅の物件一覧（2LDK条件）の建物数・総物件数を参考値として掲載したもので、駅徒歩15分以内など特定の徒歩条件で絞り込んだ件数ではなく、常時変動する検索結果のスナップショット（2026年8月8日時点）である点にご留意ください。</p>
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx</div>
+      <div class="pageno">16/16　子育て移住 計画都市パンフレット</div>
+    </div>
+  </section>
+</body>
+</html>

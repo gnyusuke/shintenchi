@@ -1,0 +1,2702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>子育て移住 居住候補エリア・パンフレット TOP10</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<style>
+  :root {
+    --navy:#1F3B4D; --accent:#E8735C; --bg:#F7F4EE; --line:#D8D2C4;
+    --grey:#6B6B6B; --dark:#333333; --dark2:#444444; --area:#2E7D6B;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin:0; padding:24px; background:#e9e4d8;
+    font-family: "Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+    color: var(--dark);
+  }
+  .page {
+    width: 100%; max-width: 210mm; min-height: 297mm; margin: 0 auto 32px auto;
+    background: var(--bg); box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    padding: 14mm 16mm 12mm 16mm; position: relative;
+  }
+  .header {
+    display:flex; align-items:center; gap:18px;
+    background: linear-gradient(135deg, var(--navy), #142834); margin: -14mm -16mm 0 -16mm; padding: 10mm 16mm;
+    border-bottom: 3px solid var(--accent);
+  }
+  .badge {
+    flex: 0 0 auto; width:72px; height:72px; border-radius:50%;
+    background: var(--accent); color:#fff; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; font-weight:700;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.15);
+  }
+  .badge-label { font-size:12px; }
+  .badge-rank { font-size:20px; }
+  .title-block { flex: 1 1 auto; color:#fff; }
+  .title-block h1 { margin:0 0 6px 0; font-size:28px; }
+  .subtitle { font-size:13px; color:#D8DEE4; }
+  .score-box {
+    flex: 0 0 auto; background:#fff; border-radius:8px; padding:10px 22px;
+    text-align:center; min-width:150px;
+  }
+  .score-box-label { font-size:11px; color:var(--navy); }
+  .score-box-value { font-size:26px; font-weight:700; color:var(--accent); margin-top:4px; }
+
+  .section-title { font-size:15px; color:var(--navy); margin:20px 0 8px 0; }
+  .summary { font-size:13.5px; line-height:1.8; color:var(--dark); margin:0 0 6px 0; }
+
+  .formula-box {
+    background:#fff; border:1px solid var(--line); border-radius:6px; padding:12px 16px;
+    font-size:13px; font-weight:700; color:var(--navy); margin:4px 0 14px 0; text-align:center;
+  }
+  .axis-grid { display:flex; gap:10px; margin:0 0 6px 0; }
+  .axis-card { flex:1; background:#fff; border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
+  .axis-title { font-weight:700; font-size:11.5px; color:var(--navy); }
+  .axis-weight { color:var(--accent); font-weight:700; }
+  .axis-desc { font-size:10px; color:var(--dark2); margin-top:5px; line-height:1.5; }
+
+  .rank-table { width:100%; border-collapse:collapse; margin:4px 0 6px 0; font-size:12px; }
+  .rank-table th { text-align:left; color:#fff; background:var(--navy); padding:8px 10px; font-weight:700; }
+  .rank-table td { padding:8px 10px; border-bottom:1px solid var(--line); }
+  .rank-table tr:nth-child(even) td { background:#F2EEE3; }
+  .rank-cell { font-weight:700; color:var(--accent); white-space:nowrap; }
+  .name-cell { font-weight:700; color:var(--navy); }
+  .score-cell { font-weight:700; color:var(--navy); white-space:nowrap; min-width:110px; }
+  .mini-bar-row { display:flex; align-items:center; gap:8px; }
+  .mini-bar-track { flex:1; background:#E7E2D6; border-radius:4px; height:6px; overflow:hidden; min-width:44px; }
+  .mini-bar-fill { background:var(--accent); height:100%; border-radius:4px; }
+
+  .score-cards { display:flex; gap:10px; margin:14px 0 6px 0; }
+  .score-card {
+    flex:1; background:#fff; border:1px solid var(--line); border-radius:8px; padding:11px 13px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .score-title { font-weight:700; font-size:11.5px; color:var(--navy); margin-bottom:6px; }
+  .score-body { font-size:10.5px; color:var(--dark2); margin-top:6px; line-height:1.5; }
+  .bar-track { background:#E7E2D6; border-radius:5px; height:8px; overflow:hidden; }
+  .bar-fill { background:var(--accent); height:100%; border-radius:5px; }
+
+  .explore { display:flex; flex-direction:column; gap:14px; margin-top:10px; }
+  .map-full-wrap { width:100%; }
+  .leaflet-map {
+    width:100%; height:360px; border:1px solid var(--line); border-radius:10px;
+    background:#EFEAE0; position:relative; z-index:0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .map-loading {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:var(--grey); font-size:12px;
+  }
+  .map-foot { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-top:8px; flex-wrap:wrap; }
+  .map-open {
+    flex:0 0 auto; display:inline-flex; align-items:center; font-size:11.5px; font-weight:700;
+    color:#fff; background:var(--area); text-decoration:none; padding:6px 12px; border-radius:20px;
+  }
+  .map-open:hover { opacity:0.88; }
+  .map-note { flex:1 1 260px; font-size:9.5px; color:var(--grey); line-height:1.6; margin:0; }
+  .pin {
+    width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,0.45);
+  }
+  .pin span { color:#fff; font-weight:700; font-size:11px; }
+  .pin.station-pin { background:var(--navy); width:30px; height:30px; }
+  .pin.station-pin span { font-size:10px; }
+  .leaflet-popup-content b { color:var(--navy); }
+  .leaflet-popup-content a { color:var(--navy); }
+
+  .area-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .area-card {
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:13px 14px 11px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:8px;
+  }
+  .area-card-head {
+    display:flex; align-items:flex-start; gap:10px; padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .area-num {
+    flex:0 0 auto; width:24px; height:24px; border-radius:50%; background:var(--area); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; margin-top:1px;
+  }
+  .area-head-text { flex:1; min-width:0; }
+  .area-name { font-weight:700; font-size:14px; color:var(--navy); line-height:1.35; }
+  .area-dist { font-size:10.5px; color:var(--grey); margin-top:2px; }
+  .area-fact { display:flex; gap:8px; align-items:flex-start; }
+  .fact-icon {
+    flex:0 0 auto; width:19px; height:19px; border-radius:5px; color:#fff; font-weight:700; font-size:10px;
+    display:flex; align-items:center; justify-content:center; margin-top:1px;
+  }
+  .fact-text { flex:1; font-size:11px; color:var(--dark2); line-height:1.6; }
+  .fact-label { display:block; font-size:9px; font-weight:700; color:var(--navy); margin-bottom:1px; letter-spacing:0.02em; }
+  .fact-sub { font-size:9.5px; color:var(--grey); }
+  .area-foot {
+    display:flex; justify-content:space-between; align-items:center; margin-top:2px;
+    padding-top:8px; border-top:1px dashed var(--line); flex-wrap:wrap; gap:6px;
+  }
+  .area-link { font-size:10.5px; color:var(--navy); text-decoration:none; font-weight:700; }
+  .area-link:hover { text-decoration:underline; }
+  .area-src { font-size:9px; }
+  .area-src a { color:var(--grey); margin-left:6px; }
+
+  .footer { margin-top:16px; padding-top:8px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-end; gap:12px; }
+  .sources { font-size:9.5px; color:var(--grey); line-height:1.5; }
+  .sources a { color:var(--grey); }
+  .pageno { font-size:10.5px; color:var(--grey); white-space:nowrap; }
+
+  @media (max-width: 700px) {
+    body { padding:8px; }
+    .page { min-height:auto; padding:5mm 4mm 4mm 4mm; margin:0 auto 16px auto; border-radius:4px; }
+    .header { flex-wrap:wrap; margin:-5mm -4mm 0 -4mm; padding:4mm; gap:10px; }
+    .badge { width:56px; height:56px; }
+    .badge-label { font-size:10px; }
+    .badge-rank { font-size:16px; }
+    .title-block h1 { font-size:19px; }
+    .subtitle { font-size:11.5px; }
+    .score-box { min-width:0; padding:8px 14px; }
+    .score-box-value { font-size:20px; }
+    .score-cards { flex-wrap:wrap; }
+    .score-card { flex:1 1 calc(50% - 5px); min-width:130px; }
+    .axis-grid { flex-wrap:wrap; }
+    .axis-card { flex:1 1 calc(50% - 5px); min-width:130px; }
+    .rank-table { display:block; overflow-x:auto; white-space:nowrap; }
+    .leaflet-map { height:260px; }
+    .area-grid { grid-template-columns:1fr; }
+    .footer { flex-direction:column; align-items:flex-start; gap:6px; }
+  }
+
+  @media print {
+    body { background:#fff; padding:0; }
+    .page { box-shadow:none; margin:0; page-break-after: always; width:auto; max-width:none; min-height:auto; }
+  }
+</style>
+</head>
+<body>
+
+  <section class="page overview-page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>子育て移住 居住候補エリア・パンフレット</h1>
+        <div class="subtitle">候補駅評価スコアリング結果（重み付け：保育・子育てコミュニティ重視）／ 居住候補エリア紹介 TOP10</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">評価対象</div>
+        <div class="score-box-value" style="font-size:18px;">129件中<br>上位10件</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ このパンフレットについて</h2>
+    <p class="summary">首都圏の子育て移住先候補として実施したスコアリング調査（全129件：駅別評価114駅＋計画整備エリア追加調査15地区）の結果をもとに、上位10地区について「実際にどのあたりに住むか」の検討材料となる居住候補エリアを紹介するパンフレットです。各地区のページには、地区概要・スコア内訳に加えて、駅周辺の具体的な居住候補エリア（町名・丁目）を5件ずつ、距離・街並み・家賃相場感・子育て動線とあわせて掲載しています。</p>
+
+    <h2 class="section-title">■ スコアの根拠（重み付けの考え方）</h2>
+    <p class="summary">「保育所充実度」と「子育てコミュニティ施策（＝計画的な街づくり・ファミリー向け地域整備度）」の重みを2倍にし、「家賃適合度」「通勤時間」の重みは通常の1倍に抑えた重み付けスコアリングです。多少家賃が高い・通勤が長くても、計画的に整備された子育て環境を重視する方向けの並び替えです。</p>
+    <div class="formula-box">スコア = 保育所充実度 ×2 ＋ 子育てコミュニティ施策 ×2 ＋ 家賃適合度 ×1 ＋ 通勤時間 ×1　（22点満点）</div>
+
+    <div class="axis-grid">
+        <div class="axis-card">
+          <div class="axis-title">保育所充実度 <span class="axis-weight">×2</span></div>
+          <div class="axis-desc">待機児童数・認可保育所数など、保育インフラの充実度。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">子育てコミュニティ施策 <span class="axis-weight">×2</span></div>
+          <div class="axis-desc">区画整理・再開発等による計画的なファミリー向け街づくり、官民連携の子育てコミュニティ形成の取り組み。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">家賃適合度 <span class="axis-weight">×1（参考）</span></div>
+          <div class="axis-desc">2LDK以上の家賃相場が予算（〜25万円）に収まるか。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">通勤時間 <span class="axis-weight">×1（参考）</span></div>
+          <div class="axis-desc">新木場駅・田町駅への通勤時間（許容ドアドア1時間、リモート80%のため出社日は許容40分）。</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ TOP10 一覧</h2>
+    <table class="rank-table">
+      <thead>
+        <tr><th>順位</th><th>地区</th><th>所在</th><th>路線</th><th>スコア</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank-cell">1位</td>
+          <td class="name-cell">流山おおたかの森</td>
+          <td>千葉県流山市</td>
+          <td>つくばエクスプレス／東武アーバンパークライン</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>22 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:100%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">2位</td>
+          <td class="name-cell">水道橋</td>
+          <td>東京都千代田区（一部文京区）</td>
+          <td>JR中央・総武線／都営三田線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>21.5 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:98%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">3位</td>
+          <td class="name-cell">品川シーサイド</td>
+          <td>東京都品川区</td>
+          <td>りんかい線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>21 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:95%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">4位</td>
+          <td class="name-cell">大井町</td>
+          <td>東京都品川区</td>
+          <td>JR京浜東北線／りんかい線／東急大井町線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>21 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:95%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">5位</td>
+          <td class="name-cell">天王洲アイル</td>
+          <td>東京都品川区</td>
+          <td>東京モノレール／りんかい線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>21 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:95%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">6位</td>
+          <td class="name-cell">旗の台</td>
+          <td>東京都品川区</td>
+          <td>東急大井町線／東急池上線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>21 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:95%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">7位</td>
+          <td class="name-cell">三田</td>
+          <td>東京都港区</td>
+          <td>都営三田線／都営浅草線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>20.5 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:93%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">8位</td>
+          <td class="name-cell">大島</td>
+          <td>東京都江東区</td>
+          <td>都営新宿線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>20.5 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:93%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">9位</td>
+          <td class="name-cell">小川町</td>
+          <td>東京都千代田区</td>
+          <td>都営新宿線／東京メトロ丸ノ内線・千代田線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>20.5 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:93%"></div></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="rank-cell">10位</td>
+          <td class="name-cell">岩本町</td>
+          <td>東京都千代田区</td>
+          <td>都営新宿線</td>
+          <td class="score-cell">
+            <div class="mini-bar-row">
+              <span>20.5 点</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:93%"></div></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-title">■ 居住候補エリアの見方</h2>
+    <p class="summary">各ページの地図は、駅（紺色のピン）を中心に、居住候補エリアを番号ピン（緑）で実際の地理座標に表示しています。各エリアのカードには「街並み・住環境」「家賃相場感」「賃貸物件の流通量」「子育て動線」の4項目を掲載しています。家賃が安くても物件の流通量が少なければ実際には選びにくいため、賃貸情報サイトで確認できた掲載件数（または建物数）を目安として併記しました。丁目単位で絞り込めないサイトが多く、その場合は同じ町名内の複数丁目で同一の参考値になっている点にご注意ください。出典が確認できない項目は「区平均よりやや高め／低め」といった定性表現にとどめています。</p>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx</div>
+      <div class="pageno">1/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">1位</span></div>
+      <div class="title-block">
+        <h1>流山おおたかの森</h1>
+        <div class="subtitle">千葉県流山市　｜　つくばエクスプレス／東武アーバンパークライン</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">22 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">つくばエクスプレス沿線に土地区画整理事業で計画的に生まれた新興住宅地。駅前2カ所に「送迎保育ステーション」を設け、駅直結の商業施設内にも保育所・学童保育を備えるなど、まちづくりと一体で子育て動線を整えてきたのが最大の特徴です。待機児童は0人、人口増加率は全国トップクラス。家賃・通勤時間にも余裕があり、総合1位となりました。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 保育施設117カ所・待機児童0人・送迎保育ステーション2カ所</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 「流山市こども計画」（令和7年3月策定）で子育て世代の転入を体系的に支援</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約16.3万円（余裕あり）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">条件内（田町はルートにより変動）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-2" class="leaflet-map" data-station='{"name": "流山おおたかの森駅", "link": "https://www.google.com/maps/search/?api=1&query=%E6%B5%81%E5%B1%B1%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E9%A7%85%20%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82", "coord": [35.8720262, 139.9258942]}' data-points='[{"num": 1, "name": "おおたかの森西一丁目", "desc": "駅（つくばエクスプレス改札）から徒歩1〜3分", "link": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E8%A5%BF%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.871044, 139.920245]}, {"num": 2, "name": "おおたかの森東一丁目〜四丁目", "desc": "東武アーバンパークライン駅から徒歩1〜8分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E6%9D%B1%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.87184, 139.926956]}, {"num": 3, "name": "西初石六丁目", "desc": "駅（南口）から徒歩10〜15分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E8%A5%BF%E5%88%9D%E7%9F%B3%E5%85%AD%E4%B8%81%E7%9B%AE", "coord": [35.880338, 139.9122839]}, {"num": 4, "name": "前ヶ崎", "desc": "駅から徒歩5〜15分（目安。地区が広いため場所により差あり）", "link": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E5%89%8D%E3%83%B6%E5%B4%8E", "coord": [35.8422168, 139.9386844]}, {"num": 5, "name": "市野谷", "desc": "駅から徒歩15分前後（目安。市野谷の森周辺は駅からやや距離あり）", "link": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E5%B8%82%E9%87%8E%E8%B0%B7", "coord": [35.862775, 139.918387]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E6%B5%81%E5%B1%B1%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E9%A7%85%20%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82" target="_blank" rel="noopener">流山おおたかの森駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">おおたかの森西一丁目</div>
+            <div class="area-dist">駅（つくばエクスプレス改札）から徒歩1〜3分</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>つくばエクスプレス駅直結側。COTOE流山おおたかの森やベルク、セキチューなど大型商業施設が集積し、周辺には高層マンションが立ち並ぶ再開発エリア。駅前ロータリーがあり、都市機能が高い一方で商業色が強い。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅徒歩5分圏の新しいタワー型マンションが中心のため、駅周辺エリアの中では家賃はやや高め。1LDKで11万円前後という駅周辺相場データあり（ieagent.jp調べ）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>464件（掲載建物123棟）<span class="fact-sub">（町丁単位。HOME'Sの「流山市おおたかの森西」ページの総物件数。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>西一丁目には認可保育園「流山おおたかの森きらきら保育園」があり、駅から徒歩7分。買い物・小児科等が入るメディカルモールも近接し、子連れでの外出動線が組みやすい。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（千葉県調べ）。人口増加が続く中、認可保育所整備を積極的に進め2021年度以降ゼロを維持。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E8%A5%BF%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://ieagent.jp/blog/eria/nagareyamaootakanomorisumiyasusa-69082" target="_blank" rel="noopener">出典1</a><a href="https://sumai.itot.jp/nagareyama-area/report03" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">おおたかの森東一丁目〜四丁目</div>
+            <div class="area-dist">東武アーバンパークライン駅から徒歩1〜8分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>東武野田線側の出口エリア。ショッピングモール「ライフガーデン流山おおたかの森」が駅直結で、保育施設・クリニック・銀行等が入居する複合施設として機能。中高層マンションと商業施設が混在する街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅近マンションが中心で、駅周辺全体の相場（ワンルーム約7.4万円、1LDK約11万円、ieagent.jp調べ）に近いかやや高めの水準とみられる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>335件（掲載建物72棟）<span class="fact-sub">（町丁単位。一〜四丁目を合算した町全体の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>東四丁目付近に認定こども園「たかさごSCHOOLおおたかの森」があり、駅直結のライフガーデン内にも子育て関連施設が入る。おおたかの森小学校（学区）も徒歩圏。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（千葉県調べ）。人口増加が続く中、認可保育所整備を積極的に進め2021年度以降ゼロを維持。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E3%81%8A%E3%81%8A%E3%81%9F%E3%81%8B%E3%81%AE%E6%A3%AE%E6%9D%B1%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://sumai.itot.jp/nagareyama-area/report03" target="_blank" rel="noopener">出典1</a><a href="https://otakanomori.tksg.ed.jp/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">西初石六丁目</div>
+            <div class="area-dist">駅（南口）から徒歩10〜15分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅南口から西初石近隣公園（通称：おおたかの森駅南口公園）を挟んだ側に広がる住宅エリア。芝生と木々の広い公園が徒歩5分圏にあり、公園より奥は低層の戸建て・マンションが混在する落ち着いた住宅街。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前タワー物件より駅から距離があるため、駅周辺相場（1LDK目安11万円前後）よりやや抑えめの水準になりやすいエリアと考えられる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>156件（掲載建物40棟）※町名単位の参考値<span class="fact-sub">（丁目単位での絞り込みは不可。西初石全丁目合算の値。六丁目のみはこれより少ない可能性が高い。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>西初石小学校が学区内にあり、西初石近隣公園、隣接する市野谷水鳥の池など自然の中で子どもと過ごせる動線がある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（千葉県調べ）。人口増加が続く中、認可保育所整備を積極的に進め2021年度以降ゼロを維持。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E8%A5%BF%E5%88%9D%E7%9F%B3%E5%85%AD%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://sumai.itot.jp/nagareyama-area/report03" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">前ヶ崎</div>
+            <div class="area-dist">駅から徒歩5〜15分（目安。地区が広いため場所により差あり）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅の南西側に広がる、区画整理前からの既存住宅地を含むエリア。戸建て住宅が中心で、新興のタワーマンションエリアとは異なる落ち着いた昔ながらの住宅街の雰囲気を持つ。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>戸建て中心のエリアで賃貸マンションの供給は駅前ほど多くなく、駅前タワー物件と比べて家賃水準は控えめとみられる（定性情報）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>75件（掲載建物17棟）<span class="fact-sub">（町丁単位。物件数は比較的少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>駅前の商業施設・医療モールへは徒歩圏。周辺の保育園（アスクおおたかの森保育園など）は駅から徒歩15分程度の立地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（千葉県調べ）。人口増加が続く中、認可保育所整備を積極的に進め2021年度以降ゼロを維持。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E5%89%8D%E3%83%B6%E5%B4%8E" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.nihonhoiku.co.jp/blog/otakanomori/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">市野谷</div>
+            <div class="area-dist">駅から徒歩15分前後（目安。市野谷の森周辺は駅からやや距離あり）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「市野谷の森」や調整池「水鳥の池」に隣接する、緑を残しながら宅地化が進むエリア。野鳥も観察できる自然環境が近く、新興の戸建て分譲地も点在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>戸建て・分譲地としての取引情報が中心で、賃貸相場としての裏取りは限定的。賃貸で住む場合は駅前タワー物件より低めとみられる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>519件（掲載建物200棟）<span class="fact-sub">（町丁単位。おおたかの森駅圏の中では物件数が多い部類。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>そらまめ保育園おおたかの森など複数の認可保育園が周辺に立地。市野谷水鳥の池や西初石近隣公園など自然の中での散歩動線が豊富。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（千葉県調べ）。人口増加が続く中、認可保育所整備を積極的に進め2021年度以降ゼロを維持。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E8%91%89%E7%9C%8C%E6%B5%81%E5%B1%B1%E5%B8%82%E5%B8%82%E9%87%8E%E8%B0%B7" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://sumai.itot.jp/nagareyama-area/report03" target="_blank" rel="noopener">出典1</a><a href="https://www.soramame-kids.jp/corner73/pg592.html" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.nagareyama.chiba.jp/life/1001107/1001162/index.html" target="_blank" rel="noopener">流山市公式（保育所充実度）</a>　／　<a href="https://www.city.nagareyama.chiba.jp/_res/projects/default_project/_page_/001/048/856/keikaku.pdf" target="_blank" rel="noopener">流山市こども計画</a></div>
+      <div class="pageno">2/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">2位</span></div>
+      <div class="title-block">
+        <h1>水道橋</h1>
+        <div class="subtitle">東京都千代田区（一部文京区）　｜　JR中央・総武線／都営三田線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">21.5 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">千代田区と文京区にまたがる都心至便のエリア。千代田区は待機児童ゼロを長年継続しています。文京区側には教育・文化施設が多く、公園・児童館・こども園が徒歩圏に点在します。都心オフィスへの通勤利便性も高水準です。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 千代田区共通（待機児童ゼロ継続）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 千代田区共通の子育て支援施策（出産・子育て応援ギフト等）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約23.2万円（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:83%"></div></div>
+          <div class="score-body">20分／25分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-3" class="leaflet-map" data-station='{"name": "水道橋駅", "link": "https://www.google.com/maps/search/?api=1&query=%E6%B0%B4%E9%81%93%E6%A9%8B%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA", "coord": [35.7021326, 139.7522067]}' data-points='[{"num": 1, "name": "千代田区神田三崎町", "desc": "駅から徒歩1〜5分", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E4%B8%89%E5%B4%8E%E7%94%BA", "coord": [35.700896, 139.7540135]}, {"num": 2, "name": "千代田区西神田", "desc": "駅から徒歩5〜10分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E8%A5%BF%E7%A5%9E%E7%94%B0", "coord": [35.6986059, 139.7555137]}, {"num": 3, "name": "文京区後楽", "desc": "駅から徒歩5〜11分（目安。小石川後楽園まで約700m）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%87%E4%BA%AC%E5%8C%BA%E5%BE%8C%E6%A5%BD", "coord": [35.7050451, 139.7478428]}, {"num": 4, "name": "文京区春日", "desc": "駅から徒歩8〜12分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%87%E4%BA%AC%E5%8C%BA%E6%98%A5%E6%97%A5", "coord": [35.7084783, 139.7527482]}, {"num": 5, "name": "文京区小石川一丁目", "desc": "駅から徒歩10〜15分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%87%E4%BA%AC%E5%8C%BA%E5%B0%8F%E7%9F%B3%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.7119279, 139.7524975]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E6%B0%B4%E9%81%93%E6%A9%8B%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA" target="_blank" rel="noopener">水道橋駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田三崎町</div>
+            <div class="area-dist">駅から徒歩1〜5分</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>水道橋駅の南側に広がる、日本大学のキャンパスやオフィスビルが集まるエリア。マンションとオフィス・古書店的な雰囲気の店舗が混在し、駅近ながら比較的静かな一角もある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅徒歩2〜3分の1LDKで18万円台という物件情報があり、千代田区都心部としては相応に高め。ワンルーム〜1LDK中心の賃貸市場。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>167件（掲載建物33棟）<span class="fact-sub">（町丁単位。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>隣接する西神田エリアの認可保育園（千代田区立西神田保育園）が徒歩圏。小石川後楽園や東京ドームシティ等の広場・公園も散歩圏内。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E4%B8%89%E5%B4%8E%E7%94%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://ja.wikipedia.org/wiki/%E7%A5%9E%E7%94%B0%E4%B8%89%E5%B4%8E%E7%94%BA" target="_blank" rel="noopener">出典1</a><a href="https://www.homes.co.jp/life/cl-spot/cm-station/54278/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区西神田</div>
+            <div class="area-dist">駅から徒歩5〜10分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>神田三崎町の南に位置し、オフィスと住宅が混在する落ち着いたエリア。千鳥ヶ淵や皇居に近く、緑を感じられる立地。学生街的な賑わいのある駅前とは対照的に静かな街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>千代田区内でも都心一等地に比べればやや抑えめだが、区平均としては高水準（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>103件（掲載建物36棟）<span class="fact-sub">（町丁単位。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>千代田区立西神田保育園（西神田2-6-2、生後2ヶ月〜5歳児対象）が立地。千代田区の公園・千鳥ヶ淵など緑地も徒歩圏。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E8%A5%BF%E7%A5%9E%E7%94%B0" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.city.chiyoda.lg.jp/koho/kosodate/hoiku/ninka/nishikanda.html" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">文京区後楽</div>
+            <div class="area-dist">駅から徒歩5〜11分（目安。小石川後楽園まで約700m）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>東京ドームシティ・ラクーアなど大型商業・エンターテインメント施設に近い北側エリア。高層マンションと小石川後楽園の緑が同居し、賑わいと自然が両立する立地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>東京ドームシティに近い高層マンションは相応に高め。文京区全体の平均をそのまま当てはめず、駅至近の利便性を反映した水準と考えるのが妥当（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>58件（掲載建物27棟）<span class="fact-sub">（町丁単位。5エリア中では物件数が少なめ。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>小石川後楽園という広大な庭園が散歩・外遊びの動線として使える。後楽園駅・春日駅方面の保育施設へのアクセスも良好。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、区の一次募集（令和7年度4月）は募集550人に対し申込623人（倍率1.13倍）で、人気園を中心にやや競争感がある。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%87%E4%BA%AC%E5%8C%BA%E5%BE%8C%E6%A5%BD" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.ohkuraya.co.jp/blog/article/31630" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">文京区春日</div>
+            <div class="area-dist">駅から徒歩8〜12分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>都営三田線・大江戸線の春日駅、丸ノ内線の後楽園駅も利用できるエリアで、住宅とオフィスが混在。文京区らしい落ち着いた雰囲気で、白山通りから一本入ると住宅街の顔を見せる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>文京区内の住宅エリアとしては標準的な水準とみられる。区平均より突出して高い立地ではないが、都心近接の割安感があるとの記述あり（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>964件（掲載建物150棟）<span class="fact-sub">（町丁単位。春日駅（三田線・大江戸線）と重なるため物件数が多い。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>認可保育園「キッズガーデン文京春日」が春日駅から徒歩5分、後楽園駅から徒歩8分の立地で、小石川後楽園など複数の公園にも近い。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、区の一次募集（令和7年度4月）は募集550人に対し申込623人（倍率1.13倍）で、人気園を中心にやや競争感がある。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%87%E4%BA%AC%E5%8C%BA%E6%98%A5%E6%97%A5" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.kidsgarden.co.jp/nursery/facility/bunkyokasuga/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">文京区小石川一丁目</div>
+            <div class="area-dist">駅から徒歩10〜15分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>小石川後楽園に近接する、文京区側の低層住宅街。水道橋駅前の商業的な賑わいから少し離れ、静かな住宅地としての性格が強くなるエリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅からやや距離があるため、水道橋駅前・後楽エリアと比べて家賃は落ち着いた水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,836件（掲載建物440棟）※町名単位の参考値<span class="fact-sub">（丁目単位での絞り込みは不可。小石川一〜五丁目を含む町全体の値。一丁目のみはこれより少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>小石川後楽園をはじめとする緑地が近く、文京区内の保育・教育施設への動線も比較的良好とされる（区内一般情報）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、区の一次募集（令和7年度4月）は募集550人に対し申込623人（倍率1.13倍）で、人気園を中心にやや競争感がある。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%96%87%E4%BA%AC%E5%8C%BA%E5%B0%8F%E7%9F%B3%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.ohkuraya.co.jp/blog/article/31630" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.chiyoda.lg.jp/koho/kosodate/hoiku/index.html" target="_blank" rel="noopener">千代田区HP（保育・子育て支援）</a></div>
+      <div class="pageno">3/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">3位</span></div>
+      <div class="title-block">
+        <h1>品川シーサイド</h1>
+        <div class="subtitle">東京都品川区　｜　りんかい線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">21 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">りんかい線沿線の再開発エリア。駅直結の大型商業施設とタワーマンション群、海沿いの公園が特徴的な近未来的な街並みです。品川区は待機児童ゼロを継続しており、タワー内保育園を含め保育の選択肢も豊富。家賃はやや高めですが、通勤利便性の高さが光ります。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">待機児童ゼロ継続</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 品川区共通の子育て施策。大規模マンション・タワーが多いエリア</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">約22〜26万円（ギリギリ〜やや不可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">18分／13分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-4" class="leaflet-map" data-station='{"name": "品川シーサイド駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6097199, 139.7498775]}' data-points='[{"num": 1, "name": "東品川四丁目", "desc": "駅から徒歩1〜5分", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E5%9B%9B%E4%B8%81%E7%9B%AE", "coord": [35.6095108, 139.7486177]}, {"num": 2, "name": "東品川二丁目", "desc": "駅から徒歩5〜10分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.6215645, 139.7503075]}, {"num": 3, "name": "南品川三丁目・五丁目", "desc": "駅から徒歩10〜13分（京急本線青物横丁駅までは徒歩約11分）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8D%97%E5%93%81%E5%B7%9D%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.6087868, 139.7439037]}, {"num": 4, "name": "北品川一丁目周辺（旧東海道沿い）", "desc": "駅から徒歩約16分（京急本線・新馬場駅経由なら公共交通で短縮可、目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8C%97%E5%93%81%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6222567, 139.7401017]}, {"num": 5, "name": "勝島一丁目", "desc": "駅から徒歩15分超（公共交通利用可。京急本線立会川駅からのアクセスも可能、目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8B%9D%E5%B3%B6%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.599285, 139.745155]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">品川シーサイド駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">東品川四丁目</div>
+            <div class="area-dist">駅から徒歩1〜5分</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅直結の複合施設「品川シーサイドフォレスト」（イオンスタイル等が入る「オーバルガーデン」を含む）を中心に、企業ビルと高層マンションが林立する計画的な再開発エリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前の高層マンションは品川シーサイド駅周辺では高めの部類。駅周辺平均は約19.7万円、1LDK目安15.6万円というデータあり（HOME'S調べ）で、駅直結物件はこの上限に近い水準とみられる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>12,509件（SUUMO）／814棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位での絞り込みは不可。東品川一〜五丁目を含む町全体（天王洲・シーサイド地区のタワー群を含む）の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>品川区立東品川保育園やアンジェリカ保育園東品川保育園など複数の認可保育園が立地。東品川公園など駅近の公園も散歩動線として利用できる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E5%9B%9B%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://journal.sumnara.jp/nearest-station/9764/" target="_blank" rel="noopener">出典1</a><a href="https://www.homes.co.jp/chintai/tokyo/shinagawaseaside_09833-st/price/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">東品川二丁目</div>
+            <div class="area-dist">駅から徒歩5〜10分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>天王洲アイル方面に近い運河沿いのエリア。倉庫を活用したオフィス・アート施設と住宅が混在し、品川シーサイド駅前の高層エリアよりやや落ち着いた街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前タワーエリアよりやや抑えめの水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>12,509件（SUUMO）／814棟（Yahoo!不動産）※町名単位の参考値（東品川四丁目と同一ソース）<span class="fact-sub">（丁目単位での絞り込みは不可。東品川町全体の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>東品川公園・しながわ区民公園方面へのアクセスが良く、区立東品川保育園の学区・通園圏内。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.property-bank.co.jp/rent/tokyo/STN9833/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">南品川三丁目・五丁目</div>
+            <div class="area-dist">駅から徒歩10〜13分（京急本線青物横丁駅までは徒歩約11分）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>京急線・青物横丁駅寄りのエリアで、下町的な商店街や低層住宅が残るゾーン。品川シーサイド駅前の再開発エリアとは対照的に、昔ながらの生活感のある街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>青物横丁寄りは品川シーサイド駅前より家賃を抑えられる傾向があるとの記述あり（定性情報）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,964件（掲載建物411棟）※町名単位の参考値<span class="fact-sub">（丁目単位での絞り込みは不可。南品川一〜六丁目を含む町全体の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>認可保育園「ルーチェ保育園南品川」（青物横丁駅徒歩2分）、「太陽の子南品川保育園」など複数の保育施設が徒歩圏にある下町エリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8D%97%E5%93%81%E5%B7%9D%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.navitime.co.jp/walk/route/guidance/00009321/00113406" target="_blank" rel="noopener">出典1</a><a href="https://www.luce-nursery.com/minamishinagawa/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">北品川一丁目周辺（旧東海道沿い）</div>
+            <div class="area-dist">駅から徒歩約16分（京急本線・新馬場駅経由なら公共交通で短縮可、目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>旧東海道の宿場町の面影が残る商店街エリア。低層の町家的建物と昔ながらの商店が並び、品川シーサイド駅周辺の再開発ゾーンとは全く異なる下町の風情が特徴。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>再開発タワーエリアと比べ低層物件が中心で、家賃は品川シーサイド駅前より控えめな傾向と考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,916件（掲載建物399棟）※町名単位の参考値<span class="fact-sub">（丁目単位での絞り込みは不可。北品川一〜六丁目を含む町全体の値。旧東海道沿いに限定すればこれより大幅に少ないとみられる。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>京急新馬場駅・北品川駅を介した子育て動線となり、旧東海道の散歩道は日常の外遊びルートにもなり得る。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8C%97%E5%93%81%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://shinagawa-kanko.or.jp/featured/20180520/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">勝島一丁目</div>
+            <div class="area-dist">駅から徒歩15分超（公共交通利用可。京急本線立会川駅からのアクセスも可能、目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>しながわ区民公園に隣接する、中層の集合住宅（団地含む）が中心のエリア。品川シーサイド駅前の高層タワーエリアとは異なり、公園に囲まれたファミリー向けの落ち着いた住環境。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅からやや距離があるため、品川シーサイド駅前平均（約19.7万円）より抑えめの水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>9件（掲載建物3棟）<span class="fact-sub">（町丁単位。他エリアと比べて物件数が極端に少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>認可保育園「にじいろ保育園勝島」が品川区民公園内に立地し、しながわ区民公園という大規模な公園が徒歩圏にあるため、外遊び・散歩の動線が豊富。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8B%9D%E5%B3%B6%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.like-kd.co.jp/establishment/nijiiro/HPkatsushima" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/kodomo-hoyou/kodomo-hoyou-hoikuen/index.html" target="_blank" rel="noopener">品川区公式「保育園」</a></div>
+      <div class="pageno">4/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">4位</span></div>
+      <div class="title-block">
+        <h1>大井町</h1>
+        <div class="subtitle">東京都品川区　｜　JR京浜東北線／りんかい線／東急大井町線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">21 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">3路線が交わるターミナル駅。2026年3月開業の複合再開発「OIMACHI TRACKS」がしながわ中央公園・新区庁舎とペデストリアンデッキで一体的に整備され、防災広場も備えた計画的な街区へと生まれ変わりつつあります。品川区の保育インフラも厚く、待機児童ゼロが続きます。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 認可等195施設・入園決定率83.3%・待機児童ゼロ（令和6年度）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 大規模再開発「OIMACHI TRACKS」進行中（商業・オフィス・防災広場・住宅）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">約28.9万円（ギリギリ〜不可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">8分／17分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-5" class="leaflet-map" data-station='{"name": "大井町駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%BA%95%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6076529, 139.734319]}' data-points='[{"num": 1, "name": "大井一丁目", "desc": "駅から徒歩1〜5分", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%A4%A7%E4%BA%95%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6058897, 139.7328798]}, {"num": 2, "name": "大井三丁目", "desc": "駅から徒歩6〜10分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%A4%A7%E4%BA%95%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.6020613, 139.7294292]}, {"num": 3, "name": "大井六丁目", "desc": "駅から徒歩12〜14分（しながわ中央公園まで約733m）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%A4%A7%E4%BA%95%E5%85%AD%E4%B8%81%E7%9B%AE", "coord": [35.5957715, 139.7310305]}, {"num": 4, "name": "東大井", "desc": "駅から徒歩10〜15分（目安。鮫洲・青物横丁方面）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%A4%A7%E4%BA%95", "coord": [35.6037231, 139.7415715]}, {"num": 5, "name": "二葉一丁目", "desc": "駅から徒歩11分（東急大井町線下神明駅からは徒歩3分）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E4%BA%8C%E8%91%89%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.606931, 139.7268033]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%BA%95%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">大井町駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">大井一丁目</div>
+            <div class="area-dist">駅から徒歩1〜5分</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>アトレ大井町、エトモ大井町、阪急大井町ガーデンなどの商業施設が集まる駅前エリア。飲食店街もあり賑わいのあるゾーン。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前の新築・駅徒歩1〜5分物件はワンルームで約10.9万円〜、1LDK中央値は約18.4万円、ファミリー向け2LDK/3LDKは中央値約26.0万円（SUUMO調べ）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,345件（掲載建物514棟）※町名単位の参考値（大井三・六丁目と同一ソース）<span class="fact-sub">（丁目単位での絞り込みは不可。大井一〜七丁目を含む町全体（再開発タワーを含む）の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>駅前の商業施設に子育て関連店舗・クリニックが集まり、日常の買い物と保育園送迎などの動線が組みやすい立地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%A4%A7%E4%BA%95%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.rehouse.co.jp/relifemode/column/burarehouse/oimachi/" target="_blank" rel="noopener">出典1</a><a href="https://suumo.jp/chintai/soba/tokyo/ek_05480/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">大井三丁目</div>
+            <div class="area-dist">駅から徒歩6〜10分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅前の商業エリアから少し離れ、住宅街の性格が強まるエリア。円形ジャングルジムなど個性的な遊具のある公園が駅から徒歩約6分の住宅街にあり、生活感のある落ち着いた雰囲気。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前一丁目よりは抑えめの水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,345件（掲載建物514棟）※町名単位の参考値（大井一・六丁目と同一ソース）<span class="fact-sub">（丁目単位での絞り込みは不可。大井町全体の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>区立大井保育園など複数の認可保育園が周辺にあり、遊具のある近隣公園が子どもの遊び場として利用できる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%A4%A7%E4%BA%95%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.homes.co.jp/life/cl-hobby/cm-stroll/70676/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">大井六丁目</div>
+            <div class="area-dist">駅から徒歩12〜14分（しながわ中央公園まで約733m）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>しながわ中央公園に近い、大井町線高架沿いを南下したエリア。公園に近く緑が多い一方、駅前の賑わいからは離れた閑静な住宅街。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅からやや距離があるため、駅前一丁目エリアより家賃は落ち着いた水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,345件（掲載建物514棟）※町名単位の参考値（大井一・三丁目と同一ソース）<span class="fact-sub">（丁目単位での絞り込みは不可。大井町全体の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>しながわ中央公園という大規模公園が徒歩圏にあり、外遊び・散歩の動線として利用しやすい。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%A4%A7%E4%BA%95%E5%85%AD%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://shinagawa-kanko.or.jp/spot/shinagawa-chuoupark/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">東大井</div>
+            <div class="area-dist">駅から徒歩10〜15分（目安。鮫洲・青物横丁方面）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>京急線鮫洲駅・青物横丁駅方面に向かうエリアで、東大井公園やしながわ区民公園、鮫洲運動公園など公園が点在する住宅街。品川区役所にも近く行政サービスの利便性も高い。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>大井町駅と京急沿線の中間に位置し、両路線の利便性を反映した水準になりやすいエリア（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,443件（掲載建物322棟）<span class="fact-sub">（町丁単位（丁目区分なし）。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>区立東大井保育園、みらいく東大井園、アソシエ東大井公園保育園など複数の認可保育園が集積。鮫洲運動公園や東品川公園への散歩コースもある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%A4%A7%E4%BA%95" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://associe-international.co.jp/%E6%96%BD%E8%A8%AD%E7%B4%B9%E4%BB%8B/higashiooi-hoikuen/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">二葉一丁目</div>
+            <div class="area-dist">駅から徒歩11分（東急大井町線下神明駅からは徒歩3分）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>東急大井町線の下神明駅至近のエリアで、駅周辺に商店が見られる以外は住宅地として利用されている閑静な住宅街。大井町駅前の賑わいとは対照的に落ち着いた雰囲気。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>大井町駅・下神明駅の中間に位置し、大井町駅前ほどの利便性プレミアムは付かず、比較的抑えめな水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,270件（掲載建物253棟）※町名単位の参考値<span class="fact-sub">（丁目単位での絞り込みは不可。二葉全丁目を含む町全体の値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>下神明駅周辺は中央公園と学校が徒歩圏の住宅エリアと紹介されており、公園・学校への動線が確保しやすい立地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E4%BA%8C%E8%91%89%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://journal.sumnara.jp/nearest-station/7395/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/kodomo-hoyou/kodomo-hoyou-hoikuen/index.html" target="_blank" rel="noopener">品川区公式「保育園」</a>　／　<a href="https://www.s-navi.jp/blog/detail?id=21" target="_blank" rel="noopener">住まいソリューション（OIMACHI TRACKS）</a></div>
+      <div class="pageno">5/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">5位</span></div>
+      <div class="title-block">
+        <h1>天王洲アイル</h1>
+        <div class="subtitle">東京都品川区　｜　東京モノレール／りんかい線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">21 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">運河沿いのウォーターフロントエリア。アートとカフェが集まる「TENNOZ ISLE」や総延長2.5kmの緑道公園が広がり、水辺の散策路が充実しています。品川区の「こども計画」やすまいるスクールなど、妊娠期から放課後まで切れ目ない子育て支援体制も強みです。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">待機児童ゼロ・認可等195施設・区全体で約1,100名分の空き</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 2026年4月「品川区こども計画」策定、幼保一体施設・すまいるスクール</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">約25.3万円（ギリギリ）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">16分／11分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-6" class="leaflet-map" data-station='{"name": "天王洲アイル駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A9%E7%8E%8B%E6%B4%B2%E3%82%A2%E3%82%A4%E3%83%AB%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6227808, 139.7508192]}' data-points='[{"num": 1, "name": "品川区東品川二丁目", "desc": "駅から徒歩0〜5分（駅自体がこの町丁に立地。パークタワー品川天王洲は徒歩4分）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.6215645, 139.7503075]}, {"num": 2, "name": "品川区東品川一丁目", "desc": "駅から徒歩5分程度", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6206661, 139.7456149]}, {"num": 3, "name": "品川区東品川三丁目", "desc": "駅から徒歩4〜9分程度", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.6149535, 139.7491354]}, {"num": 4, "name": "港区港南三丁目", "desc": "駅から徒歩約15分（目安。約1160m）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E6%B8%AF%E5%8D%97%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.6336992, 139.751088]}, {"num": 5, "name": "品川区東品川四丁目", "desc": "駅から徒歩10〜15分程度（目安。品川シーサイド駅の方が近い立地の物件が多い）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E5%9B%9B%E4%B8%81%E7%9B%AE", "coord": [35.6095108, 139.7486177]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A9%E7%8E%8B%E6%B4%B2%E3%82%A2%E3%82%A4%E3%83%AB%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">天王洲アイル駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区東品川二丁目</div>
+            <div class="area-dist">駅から徒歩0〜5分（駅自体がこの町丁に立地。パークタワー品川天王洲は徒歩4分）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>運河に囲まれた再開発エリアで、タワーマンション・オフィスビル・アートギャラリーが混在。街路樹や運河沿いの歩道が整備され開放感のあるウォーターフロント景観が特徴。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅周辺全体の目安としてワンルーム〜1DKで7〜12万円程度という記述あり（時期の明記なし、参考程度）。タワマン中心のため品川区平均よりやや高め傾向。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>12,509件（SUUMO）／814棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、東品川全体（1〜5丁目共通）の参考値。参考：天王洲アイル駅単位はYahoo!不動産979件。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>天王洲公園（多目的広場）、東品川海上公園（くじら型滑り台・運河沿いボードウォーク）があり、ウィズブック保育園天王洲など駅近隣に保育施設がある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://shinagawapark-nts.com/tennozu.html" target="_blank" rel="noopener">出典1</a><a href="https://n-u.jp/blog/%E5%93%81%E5%B7%9D%E5%8C%BA-%E5%A4%A9%E7%8E%8B%E6%B4%B2%E3%82%A2%E3%82%A4%E3%83%AB%E9%A7%85/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区東品川一丁目</div>
+            <div class="area-dist">駅から徒歩5分程度</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>山手通り沿いにワンルーム〜1DKの単身向け物件が並ぶ一方、旧海岸通り周辺はオフィスビルと住宅が混在。テレビ東京天王洲スタジオも所在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>シングル向け中心の物件が多く、目安としてワンルーム〜1DK7〜12万円程度（複数不動産サイトの要約、参考値）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>12,509件（SUUMO）／814棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、東品川全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>東品川児童センター（保育園併設施設、天王洲アイル駅徒歩9分）があり、品川区立の保育園も周辺に点在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://shinagawa-pocket.city-hc.jp/nursery/detail/S017" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区東品川三丁目</div>
+            <div class="area-dist">駅から徒歩4〜9分程度</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>勝島運河沿いにファミリー向けの免震タワーマンションなどが立地する閑静な住宅街。品川シーサイドフォレストやイオン品川シーサイドショッピングセンターへのアクセスも良い。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>タワーマンションが中心のため、ファミリー向け住戸は品川区平均よりやや高め傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>12,509件（SUUMO）／814棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、東品川全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>しながわ中央公園や品川区立の認可保育園が徒歩圏にある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://rf12.jp/building/6868/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">港区港南三丁目</div>
+            <div class="area-dist">駅から徒歩約15分（目安。約1160m）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>品川駅東口（港南口）側に広がる再開発エリアで、オフィスビル・タワーマンションと中低層マンションが混在する海側の開放的な街並み。行政区分は港区。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>ファミリー向け2LDK〜3LDKで19〜25万円程度という記述あり（駅徒歩15分圏内の目安、参考値）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>4,239件（SUUMO）／342棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、港南全体の参考値。東品川エリアより物件数はやや少なめ。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>港区立港南小学校・港南幼稚園・港南中学校が近接しており、ファミリー向け物件も多いエリアとされる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。区独自の入園決定率・倍率の公表は確認できず。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E6%B8%AF%E5%8D%97%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://ja.wikipedia.org/wiki/%E6%B8%AF%E5%8C%BA%E7%AB%8B%E6%B8%AF%E5%8D%97%E5%B0%8F%E5%AD%A6%E6%A0%A1" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区東品川四丁目</div>
+            <div class="area-dist">駅から徒歩10〜15分程度（目安。品川シーサイド駅の方が近い立地の物件が多い）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>勝島運河沿いの住宅・マンションエリアで、大型商業施設（イオン品川シーサイドショッピングセンター等）に近接。閑静な住宅街と商業利便性が両立するエリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>大型マンションが多く、品川区平均並みかやや高めの傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>12,509件（SUUMO）／814棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、東品川全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>品川区立の保育園・公園が複数あり、しながわ区民公園も利用圏内。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E5%9B%9B%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.homes.co.jp/archive/list/tokyo/shinagawa-city/tlU1HRS7VNFvpe47iWbR3g-addr/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/20250408102519.html" target="_blank" rel="noopener">品川区公式「品川区こども計画」</a>　／　<a href="https://www.hokatsunomikata.com/taiki_infos/636" target="_blank" rel="noopener">保活サポート</a></div>
+      <div class="pageno">6/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">6位</span></div>
+      <div class="title-block">
+        <h1>旗の台</h1>
+        <div class="subtitle">東京都品川区　｜　東急大井町線／東急池上線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">21 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">東急大井町線と池上線が交わる、7つの商店街を抱える下町的な駅。品川区は待機児童10年連続ゼロ・子育てランキング1位の実績を持ち、駅前に昭和大学病院（小児医療含む総合病院）があるなど医療アクセスも良好です。家賃・通勤時間ともにバランスが取れています。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 品川区共通（待機児童10年連続ゼロ、子育てランキング1位）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 昭和大学病院（小児医療含む総合病院）が駅前にあり医療アクセスも良好</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約22万円（池上線徒歩5分・42㎡の例）（可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">22分／32分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-7" class="leaflet-map" data-station='{"name": "旗の台駅", "link": "https://www.google.com/maps/search/?api=1&query=%E6%97%97%E3%81%AE%E5%8F%B0%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6051865, 139.7033846]}' data-points='[{"num": 1, "name": "品川区旗の台一丁目", "desc": "駅から徒歩1〜5分程度（目安。中原街道の旗の台交差点周辺）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%97%97%E3%81%AE%E5%8F%B0%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6089176, 139.7033474]}, {"num": 2, "name": "品川区旗の台三丁目", "desc": "駅東口から南下し徒歩5〜10分程度（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%97%97%E3%81%AE%E5%8F%B0%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.6052322, 139.7059438]}, {"num": 3, "name": "品川区旗の台四丁目", "desc": "駅から徒歩3〜8分程度（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%97%97%E3%81%AE%E5%8F%B0%E5%9B%9B%E4%B8%81%E7%9B%AE", "coord": [35.6028497, 139.7050895]}, {"num": 4, "name": "品川区中延一丁目", "desc": "旗の台駅から徒歩10〜15分程度（目安。中延駅・荏原町駅の利用も可）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E4%B8%AD%E5%BB%B6%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6128307, 139.7110185]}, {"num": 5, "name": "品川区荏原一丁目（荏原町駅周辺）", "desc": "旗の台駅から徒歩10〜15分程度（目安。荏原町駅の利用も可）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E8%8D%8F%E5%8E%9F%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6200001, 139.7137584]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E6%97%97%E3%81%AE%E5%8F%B0%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">旗の台駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区旗の台一丁目</div>
+            <div class="area-dist">駅から徒歩1〜5分程度（目安。中原街道の旗の台交差点周辺）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>昭和大学旗の台キャンパス・昭和大学病院があり、街全体に落ち着いたアカデミックな雰囲気。区立第二延山小学校も所在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>旗の台駅周辺の相場目安は1R/1K 8.5〜10.0万円、1LDK 17.0〜21.0万円、2LDK 19.0〜25.0万円（出典：湾岸Rマガジン2025年11月時点）。各駅停車の長原・荏原町駅よりやや高め傾向。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,349件（SUUMO）／371棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、旗の台全体の参考値。参考：旗の台駅単位はYahoo!不動産1,015件。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>区立第二延山小学校が近接し、昭和大学病院により小児医療へのアクセスも良好。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%97%97%E3%81%AE%E5%8F%B0%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.start-line.co.jp/magazine/23ku-info/7377/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区旗の台三丁目</div>
+            <div class="area-dist">駅東口から南下し徒歩5〜10分程度（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>昔ながらの雰囲気が漂う「旗の台三丁目商店会」や旗岡八幡神社があり、文教大学付属中学校・高等学校も立地する閑静で落ち着いた住宅街。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>旗の台駅相場（上記）と同水準。商店街近接のため生活利便性は高い（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,349件（SUUMO）／371棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、旗の台全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>遊具が豊富な「旗の台なか公園」、「旗の台公園」があり、子どもの遊び場に困らない環境。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%97%97%E3%81%AE%E5%8F%B0%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.s-navi.jp/blog/detail?id=14" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区旗の台四丁目</div>
+            <div class="area-dist">駅から徒歩3〜8分程度（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「旗の台四丁目商店街」（ナンカ堂、オオゼキ旗の台店等）があり、地区計画により住環境の保全・向上が図られているエリア。低層住宅と商店が調和した街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>商店街近接エリアとして旗の台駅相場並み（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,349件（SUUMO）／371棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、旗の台全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>商店街を抜けて公園へ続く生活動線があり、洗足池公園へも徒歩圏内でアクセス可能。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%97%97%E3%81%AE%E5%8F%B0%E5%9B%9B%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="http://tokyo-syoutengai.seesaa.net/article/218644354.html" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区中延一丁目</div>
+            <div class="area-dist">旗の台駅から徒歩10〜15分程度（目安。中延駅・荏原町駅の利用も可）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>中延商店街・戸越銀座に近く、下町情緒あふれるエリア。新旧の住宅が混在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>中延駅・荏原町駅利用可能エリアとして、旗の台駅周辺よりやや割安傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,658件（SUUMO）／314棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、中延全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>このえ中延保育園（認可保育園、定員70名、2017年開園）など複数の保育施設が商店街周辺にある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E4%B8%AD%E5%BB%B6%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://kodomo.solasto-hoiku.com/nursery/konoe-nakanobu/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">品川区荏原一丁目（荏原町駅周辺）</div>
+            <div class="area-dist">旗の台駅から徒歩10〜15分程度（目安。荏原町駅の利用も可）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「荏原町商店街」が活気ある賑やかな街並みで、住宅街には新旧の一戸建て・低層マンション・アパートが建ち並ぶ。駅周辺に学校が多くファミリー層が多い。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>荏原町駅は旗の台駅（急行停車駅）より各駅停車駅であるため家賃はやや低め傾向とされる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>4,016件（SUUMO）／425棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、荏原全体の参考値。5エリア中最も物件数が多い。参考：荏原町駅単位はYahoo!不動産1,109件。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>駅周辺に学校が多く、ファミリー向けの住環境が整っている。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E8%8D%8F%E5%8E%9F%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.room-cafe-shibuya.com/blog/6879/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/kodomo-hoyou/kodomo-hoyou-hoikuen/index.html" target="_blank" rel="noopener">品川区公式「保育園」</a></div>
+      <div class="pageno">7/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">7位</span></div>
+      <div class="title-block">
+        <h1>三田</h1>
+        <div class="subtitle">東京都港区　｜　都営三田線／都営浅草線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">20.5 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">港区は2019年度以降待機児童ゼロを継続し、認可保育園97件と選択肢も豊富。子ども家庭総合支援センター（みなとキッズサポートセンター）を運営するほか、2025年7月には屋内遊び場「あっぴぃパーク高輪」が開設するなど施設拡充が進んでいます。家賃はやや予算超過気味ですが、通勤利便性は高水準です。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">2019年度以降待機児童ゼロ継続（認可保育園97件）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 子ども家庭総合支援センター運営、2025年7月「あっぴぃパーク高輪」開設等施設拡充中</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">約29.4万円（不可（ギリギリ超過））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:83%"></div></div>
+          <div class="score-body">7分／24分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-8" class="leaflet-map" data-station='{"name": "三田駅", "link": "https://www.google.com/maps/search/?api=1&query=%E4%B8%89%E7%94%B0%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA", "coord": [35.6484862, 139.7490228]}' data-points='[{"num": 1, "name": "港区三田二丁目", "desc": "駅から徒歩5〜10分程度（目安。台地上に位置し坂道あり）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.6498447, 139.7416815]}, {"num": 2, "name": "港区三田一丁目", "desc": "三田駅A10出口から慶應義塾大学三田キャンパスまで徒歩約3分", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6537504, 139.7416761]}, {"num": 3, "name": "港区芝五丁目", "desc": "駅至近（徒歩1〜5分。三田駅自体がこの町丁に所在）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E8%8A%9D%E4%BA%94%E4%B8%81%E7%9B%AE", "coord": [35.647148, 139.7469836]}, {"num": 4, "name": "港区三田四丁目", "desc": "駅から徒歩10〜15分程度（目安。高輪地区総合支所管内）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E5%9B%9B%E4%B8%81%E7%9B%AE", "coord": [35.6439423, 139.7394338]}, {"num": 5, "name": "港区三田五丁目", "desc": "駅から徒歩10〜15分程度（目安。白金高輪駅・田町駅の利用も可）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E4%BA%94%E4%B8%81%E7%9B%AE", "coord": [35.6462724, 139.738259]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E4%B8%89%E7%94%B0%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA" target="_blank" rel="noopener">三田駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">港区三田二丁目</div>
+            <div class="area-dist">駅から徒歩5〜10分程度（目安。台地上に位置し坂道あり）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>江戸期の大名屋敷跡地に由来する高級邸宅街。「綱坂」「日向坂」などの坂道沿いに低層マンションや立派な戸建てが集まり、港区とは思えない静けさ。慶應義塾大学三田キャンパス、イタリア大使館なども所在。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>港区内でも屈指の高級住宅地で、区平均よりかなり高め傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>4,680件（SUUMO）／551棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、三田全体の参考値。参考：三田駅単位はYahoo!不動産1,734件。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>亀塚公園・三田台公園（高輪寄り）が近接。太陽の子三田保育園など認可保育施設もある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。区独自の入園決定率・倍率の公表は確認できず。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://gendai.media/articles/-/41803" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">港区三田一丁目</div>
+            <div class="area-dist">三田駅A10出口から慶應義塾大学三田キャンパスまで徒歩約3分</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>慶應義塾大学三田キャンパスを中心とした学生街とビジネス街が融合するエリア。飲食店が豊富で活気があり、麻布十番駅側で再開発も進行中。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>三田駅周辺（RC造）の家賃相場は新築で約131,039円、築10年で約109,666円（出典：ホームズ、2026年7月時点データ）。主に単身・コンパクトタイプの目安で、ファミリー向け広さの物件は港区平均より高め傾向。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>4,680件（SUUMO）／551棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、三田全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>三田図書館（駅徒歩5分）があり、周辺に認可保育園も複数存在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。区独自の入園決定率・倍率の公表は確認できず。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.homes.co.jp/chintai/tokyo/mita_06402-st/price/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">港区芝五丁目</div>
+            <div class="area-dist">駅至近（徒歩1〜5分。三田駅自体がこの町丁に所在）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>国道15号沿いに日本電気（NEC）や森永製菓など大企業本社・高層ビルが立地するビジネス色の強いエリア。田町駅方面は落ち着いた住宅街の雰囲気もある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>オフィス街に近く単身向け物件が中心のため、区平均よりやや高め傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>7,071件（SUUMO）／765棟（Yahoo!不動産）※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、芝全体の参考値。5エリア中最も物件数が多い。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>愛育病院・済生会中央病院など大規模医療機関が近接し、医療アクセスが良好。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。区独自の入園決定率・倍率の公表は確認できず。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E8%8A%9D%E4%BA%94%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.athome.co.jp/town-library/tokyo/mita-st/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">港区三田四丁目</div>
+            <div class="area-dist">駅から徒歩10〜15分程度（目安。高輪地区総合支所管内）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「寺町」と呼ばれ、三田台の上下に寺院が数多く残る歴史ある閑静な住宅地。港区立御田小学校が所在する。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>三田エリアの中でも閑静な高台の住宅地として、区平均よりやや高め〜同水準（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>4,680件（SUUMO）／551棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、三田全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>港区立御田小学校、亀塚公園（三田4-16-20、児童遊具あり）、太陽の子三田保育園などが徒歩圏にある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。区独自の入園決定率・倍率の公表は確認できず。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E5%9B%9B%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://ja.wikipedia.org/wiki/%E6%B8%AF%E5%8C%BA%E7%AB%8B%E5%BE%A1%E7%94%B0%E5%B0%8F%E5%AD%A6%E6%A0%A1" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">港区三田五丁目</div>
+            <div class="area-dist">駅から徒歩10〜15分程度（目安。白金高輪駅・田町駅の利用も可）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>古川（渋谷川）沿いの低地に住宅と商店街が混在する庶民的なエリア。「三田五丁目西地区市街地再開発事業」（地上45階、約600戸、2030年度竣工予定）が進行中で、今後街並みが大きく変化する見込み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>現状は三田・田町エリアの中では比較的抑えめな価格帯とされるが、再開発により将来的な家賃上昇も見込まれる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>4,680件（SUUMO）／551棟（Yahoo!不動産）※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、三田全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>太陽の子三田五丁目保育園（赤羽橋・麻布十番・三田各駅から利用可）などの認可保育施設がある。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。区独自の入園決定率・倍率の公表は確認できず。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E4%B8%89%E7%94%B0%E4%BA%94%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.kidslife-nursery.com/facility/tokyo/minato/mita1/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://smartsitter.jp/column/post-1681/" target="_blank" rel="noopener">smartsitter</a>　／　<a href="https://www.city.minato.tokyo.jp/kosodatesien/kodomo/kodomo/shienshisetsu/shien.html" target="_blank" rel="noopener">港区HP（子育て支援施設）</a></div>
+      <div class="pageno">8/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">8位</span></div>
+      <div class="title-block">
+        <h1>大島</h1>
+        <div class="subtitle">東京都江東区　｜　都営新宿線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">20.5 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">都営新宿線の急行停車駅で、新宿まで30分弱。江東区は3年連続待機児童ゼロを継続しています。家賃相場は約13万円台と大幅に余裕がある一方、通勤時間は36分とやや長めのため要確認です。団地と商店街が調和した下町エリアで、近隣には複数の公園があります。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 江東区共通（3年連続待機児童ゼロ）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 江東区共通の子育て施策</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">約13.4万円（大島7丁目は約12.2万円とさらに割安）（可（大幅に余裕あり））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+          <div class="score-body">36分／36分（要注意）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-9" class="leaflet-map" data-station='{"name": "大島駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%B3%B6%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA", "coord": [35.6897695, 139.835076]}' data-points='[{"num": 1, "name": "江東区大島三丁目", "desc": "大島駅から徒歩3〜5分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%A4%A7%E5%B3%B6%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.691658, 139.828897]}, {"num": 2, "name": "江東区大島一丁目", "desc": "大島駅から徒歩5〜8分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%A4%A7%E5%B3%B6%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.687179, 139.823428]}, {"num": 3, "name": "江東区大島六丁目", "desc": "大島駅から徒歩10〜12分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%A4%A7%E5%B3%B6%E5%85%AD%E4%B8%81%E7%9B%AE", "coord": [35.691935, 139.834633]}, {"num": 4, "name": "江東区北砂五丁目", "desc": "大島駅から徒歩12〜13分（目安、物件により徒歩17分程度の場所もあり）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%8C%97%E7%A0%82%E4%BA%94%E4%B8%81%E7%9B%AE", "coord": [35.682879, 139.833083]}, {"num": 5, "name": "江東区東砂三丁目", "desc": "大島駅から徒歩15分程度（目安。バス便併用も可）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E6%9D%B1%E7%A0%82%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.680616, 139.8429509]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E5%B3%B6%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA" target="_blank" rel="noopener">大島駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">江東区大島三丁目</div>
+            <div class="area-dist">大島駅から徒歩3〜5分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅前に「大島中の橋商店街（サンロード中の橋）」が広がり、約100店舗の商店・スーパー・ドラッグストア・クリニックが集まる生活利便性の高いエリア。大島団地をはじめとする中高層の団地・マンションが多く、昔ながらの下町の賑わいが残る。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>SUUMOの大島駅周辺相場では新築・駅徒歩1〜5分でワンルーム約10.6万円〜4LDK約33.8万円、一般的な物件は5万円台〜16万円台が中心（6万〜12万円が主体）で、江東区内・都心近接エリアとしては比較的手頃な水準（出典：SUUMO「大島駅の家賃相場」）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>14,650件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、大島全体（一〜九丁目等）の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>駅徒歩5分の「大島五丁目公園」（2022年リニューアル、遊具充実）が近く、周辺には認可保育園・小規模保育所が複数点在。商店街での買い物と保育園送迎の動線がまとまりやすい。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、人気園の一次募集倍率は施設により2〜8倍程度まで幅があり、希望園への入りやすさは施設差が大きい。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%A4%A7%E5%B3%B6%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.homes.co.jp/cont/town/town_00682/" target="_blank" rel="noopener">出典1</a><a href="https://journal.sumnara.jp/nearest-station/8975/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">江東区大島一丁目</div>
+            <div class="area-dist">大島駅から徒歩5〜8分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「大島中央銀座商店街」に近い住宅地で、団地・分譲マンション・戸建てが混在する落ち着いた住環境。明治通り沿いは商業施設もありつつ、一本入ると住宅街が広がる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>大島駅周辺は区平均並みかやや抑えめの水準とされ、ワンルーム〜1LDKが中心（出典：SUUMO「大島駅の家賃相場」）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>14,650件※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、大島全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>近隣の商店街での日常の買い物動線に加え、区立保育園・こども園が徒歩圏に複数あり、通勤前後の送迎がしやすい立地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、人気園の一次募集倍率は施設により2〜8倍程度まで幅があり、希望園への入りやすさは施設差が大きい。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%A4%A7%E5%B3%B6%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://journal.sumnara.jp/nearest-station/8975/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">江東区大島六丁目</div>
+            <div class="area-dist">大島駅から徒歩10〜12分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅前商業エリアからやや離れ、大島小松川公園方面に近い比較的閑静な住宅街。中高層マンションと低層住宅が混在し、緑の多い環境が特徴。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅遠になる分、駅近エリアよりやや割安な傾向（定性的傾向）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>14,650件※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、大島全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>大島小松川公園（一部は江戸川区にまたがる広域公園）や周辺の児童遊園が身近。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、人気園の一次募集倍率は施設により2〜8倍程度まで幅があり、希望園への入りやすさは施設差が大きい。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%A4%A7%E5%B3%B6%E5%85%AD%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.tokyo-park.or.jp/park/ojima-komatsugawa/index.html" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">江東区北砂五丁目</div>
+            <div class="area-dist">大島駅から徒歩12〜13分（目安、物件により徒歩17分程度の場所もあり）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「北砂五丁目団地」を中心とした大規模団地エリア。団地の敷地内に「憩いの森」と呼ばれる緑豊かな公園があり、幼稚園・小学校も団地敷地内に立地する、子育てに配慮された住環境。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>団地内住戸は比較的手頃な家賃帯が多いとされる（定性的傾向）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>6,043件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、北砂全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>小鳩スマート保育所北砂（大島駅徒歩12分）、江東区北砂保育園（北砂五丁目内）など保育施設が団地周辺に点在し、区立第五砂町幼稚園も近接。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、人気園の一次募集倍率は施設により2〜8倍程度まで幅があり、希望園への入りやすさは施設差が大きい。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E5%8C%97%E7%A0%82%E4%BA%94%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="http://www.realdanchiestate.jp/?p=31" target="_blank" rel="noopener">出典1</a><a href="https://www.kobato.net/kitasuna/" target="_blank" rel="noopener">出典2</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">江東区東砂三丁目</div>
+            <div class="area-dist">大島駅から徒歩15分程度（目安。バス便併用も可）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>大島駅・南砂町駅のいずれからも徒歩15分前後の住宅地で、中低層マンション・戸建てが中心の落ち着いたエリア。商業施設は南砂町方面が中心となる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅からやや距離があるため、大島駅前エリアより家賃は抑えめの傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,072件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、東砂全体の参考値。大島・北砂と比べて明らかに少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>砂町・南砂地区は認可保育園が複数整備されているエリアで、区の子育て施設案内にも掲載あり。公園も点在し、徒歩での送迎がしやすい住宅密集地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ（都基準）<span class="fact-sub">（令和7年4月1日時点（東京都調べ）ではゼロだが、人気園の一次募集倍率は施設により2〜8倍程度まで幅があり、希望園への入りやすさは施設差が大きい。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B1%9F%E6%9D%B1%E5%8C%BA%E6%9D%B1%E7%A0%82%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.city.koto.lg.jp/280308/kodomo/hoiku/ninka/shokai/syoukaiii.html" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.koto.lg.jp/" target="_blank" rel="noopener">江東区公式</a></div>
+      <div class="pageno">9/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">9位</span></div>
+      <div class="title-block">
+        <h1>小川町</h1>
+        <div class="subtitle">東京都千代田区　｜　都営新宿線／東京メトロ丸ノ内線・千代田線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">20.5 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">神保町・淡路町に隣接する、新旧がバランス良く共存するエリア。千代田区は待機児童0人を継続し、学童待機児童も15年以上ゼロを継続する手厚さが特徴です。神保町の古書店街をはじめ文化的な街並みも魅力。家賃はギリギリ予算内に収まります。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 千代田区共通、待機児童0人</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 千代田区共通（学童待機児童も15年以上ゼロ継続）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">神田小川町エリアで2LDK25.9万円の物件例（ギリギリ（予算内））</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:83%"></div></div>
+          <div class="score-body">22分／30分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-10" class="leaflet-map" data-station='{"name": "小川町駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%B0%8F%E5%B7%9D%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA", "coord": [35.6949465, 139.7662986]}' data-points='[{"num": 1, "name": "千代田区神田小川町一丁目", "desc": "小川町駅から徒歩1〜3分（目安、駅所在地そのもの）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%B0%8F%E5%B7%9D%E7%94%BA%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.694724, 139.766412]}, {"num": 2, "name": "千代田区神田小川町三丁目", "desc": "小川町駅から徒歩5分程度（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%B0%8F%E5%B7%9D%E7%94%BA%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.695402, 139.762406]}, {"num": 3, "name": "千代田区神田淡路町二丁目", "desc": "小川町駅から徒歩2〜3分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E6%B7%A1%E8%B7%AF%E7%94%BA%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.697519, 139.767838]}, {"num": 4, "name": "千代田区神田猿楽町一丁目", "desc": "小川町駅から徒歩7〜8分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E7%8C%BF%E6%A5%BD%E7%94%BA%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.698165, 139.7599554]}, {"num": 5, "name": "千代田区西神田二丁目", "desc": "小川町駅から徒歩10〜12分（目安。神保町駅・水道橋駅からはより近い）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E8%A5%BF%E7%A5%9E%E7%94%B0%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.698802, 139.755267]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%B0%8F%E5%B7%9D%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA" target="_blank" rel="noopener">小川町駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田小川町一丁目</div>
+            <div class="area-dist">小川町駅から徒歩1〜3分（目安、駅所在地そのもの）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅直上・駅前エリアで、スポーツ用品店街（さくら通り）やオフィスビルが密集する商業色の強い立地。マンションも点在し、複数路線（新御茶ノ水・神保町・淡路町各駅も徒歩3分圏）が使える利便性重視のエリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>千代田区全体では単身・少人数向け物件が中心でワンルーム12万円前後が目安とされる（出典：SUUMO「東京都千代田区の家賃相場」）。駅至近のため区内でも高めの水準になりやすい。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>792件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、神田小川町全体（一・三丁目）の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>商業ビルが多いため居住向け施設はやや少なめだが、徒歩10分圏に区立お茶の水小学校・西神田保育園などがあり、都心利便性と子育て施設を両立させたいファミリー向け。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%B0%8F%E5%B7%9D%E7%94%BA%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.kanda-ogawamachi.com/access" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田小川町三丁目</div>
+            <div class="area-dist">小川町駅から徒歩5分程度（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>「神田小川町三丁目西部南地区第一種市街地再開発事業」が進行中のエリアで、地上22階（高さ約110m）のビルが計画され、高層部は住宅となる予定。再開発による街並みの変化が今後見込まれる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>再開発により新築マンション供給が見込まれるエリアで、竣工後は区内でも高水準の家賃になる可能性が高い（現時点では定性的見込み）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>792件※町名単位の参考値（上記と同一）<span class="fact-sub">（丁目単位の絞り込み不可のため、神田小川町全体の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>神保町・小川町エリアに近く、区立の保育園・幼稚園（西神田保育園、お茶の水幼稚園等）が徒歩10分圏内に点在。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%B0%8F%E5%B7%9D%E7%94%BA%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://skyskysky.net/construction/202616.html" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田淡路町二丁目</div>
+            <div class="area-dist">小川町駅から徒歩2〜3分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>大型再開発「ワテラス（WATERRAS）」があるエリアで、地上41階建てのワテラスタワーにオフィス・住宅（タワーマンション）・学生マンション・商業施設・コミュニティ施設が入る再開発済みの都心居住エリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>タワーマンション住戸は千代田区内でも高水準の家賃帯になりやすい（定性的傾向）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>190件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、神田淡路町全体（一・二丁目）の参考値。物件数は比較的少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>ワテラス内にはコミュニティ施設もあり、周辺の区立保育園・小学校（お茶の水小学校等）へのアクセスも比較的良好。再開発地区特有の広場空間があり、子ども連れでも歩きやすい。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E6%B7%A1%E8%B7%AF%E7%94%BA%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://office.nskre.co.jp/search/area/04/kandaawajicho/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田猿楽町一丁目</div>
+            <div class="area-dist">小川町駅から徒歩7〜8分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>明治大学に近く、南は神田小川町、西は西神田・神保町に接する落ち着いたエリア。区立お茶の水小学校・お茶の水幼稚園が立地し、大学街と住宅地が同居する落ち着いた雰囲気。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅からやや離れる分、駅前商業エリアよりは相場が落ち着く傾向（定性表現。区平均はワンルーム12万円前後）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>622件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、神田猿楽町全体（一・二丁目）の参考値。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>区立お茶の水小学校・お茶の水幼稚園が徒歩圏内にあり、千代田区は認可保育園も約20園整備され待機児童の心配が少ないとされるエリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E7%8C%BF%E6%A5%BD%E7%94%BA%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://ja.wikipedia.org/wiki/%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%AB%8B%E3%81%8A%E8%8C%B6%E3%81%AE%E6%B0%B4%E5%B0%8F%E5%AD%A6%E6%A0%A1" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区西神田二丁目</div>
+            <div class="area-dist">小川町駅から徒歩10〜12分（目安。神保町駅・水道橋駅からはより近い）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>神保町駅・水道橋駅からも徒歩7〜8分程度でアクセスできる住宅地で、オフィスビルより住宅・マンションの比率が高い落ち着いたエリア。西神田公園があり、緑の少ない都心にあって貴重な広場空間。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>千代田区内では住宅色の強いエリアで、区平均並みか商業地よりはやや抑えめの傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>173件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、西神田全体（一〜三丁目）の参考値。物件数は比較的少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>西神田保育園（西神田二丁目6番2号）が西神田公園に隣接し、公園での外遊びと保育園が一体的に使える環境。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E8%A5%BF%E7%A5%9E%E7%94%B0%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.city.chiyoda.lg.jp/shisetsu/hoikuen/nishikanda-ho.html" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.chiyoda.lg.jp/koho/kosodate/hoiku/index.html" target="_blank" rel="noopener">千代田区HP（保育・子育て支援）</a></div>
+      <div class="pageno">10/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">10位</span></div>
+      <div class="title-block">
+        <h1>岩本町</h1>
+        <div class="subtitle">東京都千代田区　｜　都営新宿線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">20.5 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">秋葉原にも近い千代田区東部のエリア。待機児童0人（令和6年4月〜令和7年1月申込分）を継続し、出産・子育て応援ギフト（最大15万円相当）やファミリーサポートセンターなど手厚い支援制度が整っています。家賃はやや予算超過気味ですが、都心アクセスの良さが魅力です。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          
+          <div class="score-body">◎ 待機児童0人（令和6年4月〜令和7年1月申込分）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          
+          <div class="score-body">◎ 出産・子育て応援ギフト（最大15万円相当）、ファミリーサポートセンター等手厚い</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">千代田区2LDK相場28万円（ギリギリ〜不可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:83%"></div></div>
+          <div class="score-body">21分／29分</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 居住候補エリア（駅周辺5カ所）</h2>
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-11" class="leaflet-map" data-station='{"name": "岩本町駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%B2%A9%E6%9C%AC%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA", "coord": [35.695614, 139.7753176]}' data-points='[{"num": 1, "name": "千代田区岩本町二丁目", "desc": "岩本町駅から徒歩1〜3分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E5%B2%A9%E6%9C%AC%E7%94%BA%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.693526, 139.776933]}, {"num": 2, "name": "千代田区東神田三丁目", "desc": "岩本町駅から徒歩5〜8分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E6%9D%B1%E7%A5%9E%E7%94%B0%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.697364, 139.781365]}, {"num": 3, "name": "千代田区神田佐久間町", "desc": "岩本町駅から徒歩9〜10分（目安、秋葉原駅からは徒歩6分）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E4%BD%90%E4%B9%85%E9%96%93%E7%94%BA", "coord": [35.697996, 139.7769499]}, {"num": 4, "name": "千代田区神田富山町", "desc": "岩本町駅から徒歩4〜7分（目安、JR神田駅からは徒歩3分）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%AF%8C%E5%B1%B1%E7%94%BA", "coord": [35.6936145, 139.7734213]}, {"num": 5, "name": "千代田区神田練塀町", "desc": "岩本町駅から徒歩7分程度（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E7%B7%B4%E5%A1%80%E7%94%BA", "coord": [35.70071, 139.774037]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%B2%A9%E6%9C%AC%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA" target="_blank" rel="noopener">岩本町駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標です。ずれる場合は各カードの「Googleマップで開く」でご確認ください。家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+      <div class="area-grid">
+        
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">1</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区岩本町二丁目</div>
+            <div class="area-dist">岩本町駅から徒歩1〜3分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅直上エリアで、古くからの繊維・衣料問屋街の名残がありつつ、近年は分譲・賃貸マンションへの建て替えが進む。秋葉原・神田・馬喰町各駅も徒歩10分圏内という複数路線利用可能な立地。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>SUUMOの岩本町駅相場（新築・駅徒歩1〜5分）はワンルーム約11.6万円〜5K以上33.3万円で、千代田区全体の相場（ワンルーム13.2万円〜）と比べるとやや抑えめの傾向（出典：SUUMO「岩本町駅の家賃相場」）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>2,535件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、岩本町全体（一〜三丁目）の参考値。物件数は比較的多い。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>問屋街エリアのため大規模公園は少ないが、周辺の区立保育園・小規模保育施設へのアクセスは徒歩圏。オフィス街・商業地に近く共働き世帯の通勤動線と両立しやすい。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E5%B2%A9%E6%9C%AC%E7%94%BA%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://suumo.jp/chintai/soba/tokyo/ek_03950/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">2</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区東神田三丁目</div>
+            <div class="area-dist">岩本町駅から徒歩5〜8分（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>馬喰町方面に近い旧問屋街エリアで、ハイツ神田岩本町（11階建て126戸、1981年竣工）のような大型マンションが立地。近年は新築マンションも増え、住宅地としての性格が強まっている。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>岩本町駅・馬喰町駅双方が使えるエリアで、駅前より落ち着いた相場になる傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>3,455件※町名単位の参考値<span class="fact-sub">（丁目単位の絞り込み不可のため、東神田全体（一〜三丁目）の参考値。物件数は比較的多い。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>馬喰町・浅草橋方面の商業施設への生活動線に加え、周辺に区立保育施設が点在。ファミリー向け広めの間取りの物件も見られる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E6%9D%B1%E7%A5%9E%E7%94%B0%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.m-standard.co.jp/buildings/15597/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">3</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田佐久間町</div>
+            <div class="area-dist">岩本町駅から徒歩9〜10分（目安、秋葉原駅からは徒歩6分）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>秋葉原駅・浅草橋駅にも近く、高級賃貸マンションが紹介されるなどグレードの高い住宅も見られるエリア。オフィス・店舗と住宅が混在する都心らしい街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>秋葉原至近という立地から、区内でも相場が高めになりやすい傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>1,118件<span class="fact-sub">（町丁単位（丁目表記なしの単独町名）。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>秋葉原周辺の商業施設への生活動線が強く、子育て施設は神田・岩本町エリア全体の区立保育園・公園を利用する形になる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E4%BD%90%E4%B9%85%E9%96%93%E7%94%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.m-standard.co.jp/rent-s/18_DA/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">4</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田富山町</div>
+            <div class="area-dist">岩本町駅から徒歩4〜7分（目安、JR神田駅からは徒歩3分）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>神田駅・岩本町駅の両方が徒歩圏という利便性の高いエリアで、リヴシティ神田（2011年築、地上13階建て）など近年築のマンションが増加。オフィスビルと住宅が混在する都心型エリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>神田駅・岩本町駅双方使える利便性から、区内でも相場は高めの傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>36件<span class="fact-sub">（町丁単位（丁目表記なしの単独町名）。物件数は明らかに少ない。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>神田駅周辺の商業施設・飲食店が生活動線の中心で、子育て施設は岩本町・神田エリア全体の保育園・公園を利用する形。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%AF%8C%E5%B1%B1%E7%94%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.townhousing.co.jp/building/%EF%BC%A2%EF%BC%B0%EF%BC%B2%E3%83%AC%E3%82%B8%E3%83%87%E3%83%B3%E3%82%B9%E7%A5%9E%E7%94%B0%E5%AF%8C%E5%B1%B1%E7%94%BA-441529" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+
+      <div class="area-card">
+        <div class="area-card-head">
+          <span class="area-num">5</span>
+          <div class="area-head-text">
+            <div class="area-name">千代田区神田練塀町</div>
+            <div class="area-dist">岩本町駅から徒歩7分程度（目安）</div>
+          </div>
+        </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>昭和通り沿いのエリアで、秋葉原・岩本町の中間に位置し、オフィスビルとマンションが混在する都心型の街並み。神田佐久間町・神田富山町と隣接し、同様に再開発・建て替えが進む地域。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>岩本町駅・秋葉原駅の複数路線が使える立地のため、区平均並みかやや高めの傾向（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#8E5FB0" title="賃貸物件の流通量">件</span>
+            <div class="fact-text"><span class="fact-label">賃貸物件の流通量</span>5件<span class="fact-sub">（町丁単位（丁目表記なしの単独町名）。物件数はきわめて少ない。事実上ほぼ流通していない水準。）</span></div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>秋葉原・岩本町エリア全体の区立保育園・公園を利用する動線になり、都心利便性重視の共働き世帯に向く。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況（区市単位）">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区市単位）</span>待機児童ゼロ<span class="fact-sub">（令和7年4月1日時点（東京都調べ）。認可保育園は区内に約20園整備され、供給に比較的余裕があるとされる。）</span></div>
+          </div>
+        <div class="area-foot">
+          <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E7%B7%B4%E5%A1%80%E7%94%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          <div class="area-src"><a href="https://www.livex-inc.com/office_and/marketprice/kanda-uchikanda-ogawamachi/" target="_blank" rel="noopener">出典1</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.chiyoda.lg.jp/" target="_blank" rel="noopener">千代田区HP</a></div>
+      <div class="pageno">11/11　子育て移住 居住候補エリア・パンフレット</div>
+    </div>
+  </section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function() {
+  function makeIcon(html, size) {
+    return L.divIcon({ className: "", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] });
+  }
+
+  function initMap(containerId) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    var station, points;
+    try {
+      station = JSON.parse(el.getAttribute("data-station"));
+      points = JSON.parse(el.getAttribute("data-points"));
+    } catch (e) {
+      el.textContent = "地図データの読み込みに失敗しました。各エリアの「Googleマップで開く」リンクをご利用ください。";
+      return;
+    }
+    el.innerHTML = "";
+
+    var map = L.map(containerId, { scrollWheelZoom: false }).setView(station.coord, 15);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var bounds = [station.coord];
+    var stationIcon = makeIcon('<div class="pin station-pin"><span>駅</span></div>', 30);
+    L.marker(station.coord, { icon: stationIcon }).addTo(map)
+      .bindPopup("<b>" + station.name + "</b><br><a href='" + station.link + "' target='_blank' rel='noopener'>Googleマップで開く</a>");
+
+    points.forEach(function(p) {
+      if (!p.coord) { return; }
+      bounds.push(p.coord);
+      var icon = makeIcon('<div class="pin" style="background:#2E7D6B"><span>' + p.num + '</span></div>', 26);
+      L.marker(p.coord, { icon: icon }).addTo(map)
+        .bindPopup("<b>" + p.name + "</b><br>" + p.desc + "<br><a href='" + p.link + "' target='_blank' rel='noopener'>Googleマップで開く</a>");
+    });
+
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+    setTimeout(function() { map.invalidateSize(); }, 200);
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".leaflet-map").forEach(function(el) { initMap(el.id); });
+  });
+})();
+</script>
+</body>
+</html>
