@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>品川シーサイド 現地下見パンフレット</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<style>
+  :root {
+    --navy:#1F3B4D; --accent:#E8735C; --bg:#F7F4EE; --line:#D8D2C4;
+    --grey:#6B6B6B; --dark:#333333; --dark2:#444444; --area:#2E7D6B;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin:0; padding:24px; background:#e9e4d8;
+    font-family: "Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+    color: var(--dark);
+  }
+  .page {
+    width: 100%; max-width: 210mm; min-height: 297mm; margin: 0 auto 32px auto;
+    background: var(--bg); box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    padding: 14mm 16mm 12mm 16mm; position: relative;
+  }
+  .header {
+    display:flex; align-items:center; gap:18px;
+    background: linear-gradient(135deg, var(--navy), #142834); margin: -14mm -16mm 0 -16mm; padding: 10mm 16mm;
+    border-bottom: 3px solid var(--accent);
+  }
+  .badge {
+    flex: 0 0 auto; width:72px; height:72px; border-radius:50%;
+    background: var(--accent); color:#fff; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; font-weight:700;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.15);
+  }
+  .badge-label { font-size:12px; }
+  .badge-rank { font-size:20px; }
+  .title-block { flex: 1 1 auto; color:#fff; }
+  .title-block h1 { margin:0 0 6px 0; font-size:28px; }
+  .subtitle { font-size:13px; color:#D8DEE4; }
+  .score-box {
+    flex: 0 0 auto; background:#fff; border-radius:8px; padding:10px 22px;
+    text-align:center; min-width:150px;
+  }
+  .score-box-label { font-size:11px; color:var(--navy); }
+  .score-box-value { font-size:26px; font-weight:700; color:var(--accent); margin-top:4px; }
+
+  .section-title { font-size:15px; color:var(--navy); margin:20px 0 8px 0; }
+  .summary { font-size:13.5px; line-height:1.8; color:var(--dark); margin:0 0 6px 0; }
+
+  .formula-box {
+    background:#fff; border:1px solid var(--line); border-radius:6px; padding:12px 16px;
+    font-size:13px; font-weight:700; color:var(--navy); margin:4px 0 14px 0; text-align:center;
+  }
+  .axis-grid { display:flex; gap:10px; margin:0 0 6px 0; }
+  .axis-card { flex:1; background:#fff; border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
+  .axis-title { font-weight:700; font-size:11.5px; color:var(--navy); }
+  .axis-weight { color:var(--accent); font-weight:700; }
+  .axis-desc { font-size:10px; color:var(--dark2); margin-top:5px; line-height:1.5; }
+
+  .score-cards { display:flex; gap:10px; margin:14px 0 6px 0; }
+  .score-card {
+    flex:1; background:#fff; border:1px solid var(--line); border-radius:8px; padding:11px 13px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .score-title { font-weight:700; font-size:11.5px; color:var(--navy); margin-bottom:6px; }
+  .score-body { font-size:10.5px; color:var(--dark2); margin-top:6px; line-height:1.5; }
+  .bar-track { background:#E7E2D6; border-radius:5px; height:8px; overflow:hidden; }
+  .bar-fill { background:var(--accent); height:100%; border-radius:5px; }
+
+  .explore { display:flex; flex-direction:column; gap:14px; margin-top:10px; }
+  .map-full-wrap { width:100%; }
+  .leaflet-map {
+    width:100%; height:360px; border:1px solid var(--line); border-radius:10px;
+    background:#EFEAE0; position:relative; z-index:0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .map-loading {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:var(--grey); font-size:12px;
+  }
+  .map-foot { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-top:8px; flex-wrap:wrap; }
+  .map-open {
+    flex:0 0 auto; display:inline-flex; align-items:center; font-size:11.5px; font-weight:700;
+    color:#fff; background:var(--area); text-decoration:none; padding:6px 12px; border-radius:20px;
+  }
+  .map-open:hover { opacity:0.88; }
+  .map-note { flex:1 1 260px; font-size:9.5px; color:var(--grey); line-height:1.6; margin:0; }
+  .pin {
+    width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,0.45);
+  }
+  .pin span { color:#fff; font-weight:700; font-size:11px; }
+  .pin.station-pin { background:var(--navy); width:30px; height:30px; }
+  .pin.station-pin span { font-size:10px; }
+  .leaflet-popup-content b { color:var(--navy); }
+  .leaflet-popup-content a { color:var(--navy); }
+
+  .legend-grid { display:flex; flex-wrap:wrap; gap:10px 22px; margin:4px 0 10px 0; }
+  .legend-item { display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--dark2); }
+  .legend-swatch { width:14px; height:14px; border-radius:50%; display:inline-block; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,0.3); }
+
+  .area-grid, .point-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .area-card, .point-card {
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:13px 14px 11px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:8px;
+  }
+  .area-card-head, .point-card-head {
+    display:flex; align-items:flex-start; gap:10px; padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .area-num, .point-num {
+    flex:0 0 auto; width:24px; height:24px; border-radius:50%; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; margin-top:1px;
+  }
+  .area-num { background:var(--area); }
+  .area-head-text, .point-head-text { flex:1; min-width:0; }
+  .area-name, .point-name { font-weight:700; font-size:14px; color:var(--navy); line-height:1.35; }
+  .area-dist, .point-walk-top { font-size:10.5px; color:var(--grey); margin-top:2px; }
+  .point-cat { font-size:10px; font-weight:700; margin-top:3px; }
+  .area-fact { display:flex; gap:8px; align-items:flex-start; }
+  .fact-icon {
+    flex:0 0 auto; width:19px; height:19px; border-radius:5px; color:#fff; font-weight:700; font-size:10px;
+    display:flex; align-items:center; justify-content:center; margin-top:1px;
+  }
+  .fact-text, .point-desc { flex:1; font-size:11px; color:var(--dark2); line-height:1.6; }
+  .fact-label { display:block; font-size:9px; font-weight:700; color:var(--navy); margin-bottom:1px; letter-spacing:0.02em; }
+  .fact-sub { font-size:9.5px; color:var(--grey); }
+  .area-foot, .point-foot {
+    display:flex; justify-content:space-between; align-items:center; margin-top:2px;
+    padding-top:8px; border-top:1px dashed var(--line); flex-wrap:wrap; gap:6px;
+  }
+  .area-link, .point-link { font-size:10.5px; color:var(--navy); text-decoration:none; font-weight:700; }
+  .area-link:hover, .point-link:hover { text-decoration:underline; }
+  .area-src { font-size:9px; }
+  .area-src a { color:var(--grey); margin-left:6px; }
+  .point-walk { font-size:10.5px; color:var(--grey); }
+
+  .nearby-grid { display:flex; gap:12px; margin-top:10px; }
+  .nearby-card { flex:1; background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 15px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+  .nearby-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .nearby-name { font-weight:700; font-size:15px; color:var(--navy); }
+  .nearby-rank { font-size:10.5px; color:#fff; background:var(--accent); border-radius:12px; padding:2px 9px; font-weight:700; white-space:nowrap; }
+  .nearby-line { font-size:10.5px; color:var(--grey); margin-bottom:8px; }
+  .nearby-desc { font-size:11.5px; color:var(--dark2); line-height:1.7; margin-bottom:8px; }
+  .nearby-from { font-size:10.5px; color:var(--navy); font-weight:700; background:#F2EEE3; border-radius:6px; padding:6px 9px; margin-bottom:8px; }
+  .nearby-link { font-size:10.5px; color:var(--navy); text-decoration:none; font-weight:700; }
+  .nearby-link:hover { text-decoration:underline; }
+
+  .route-timeline { margin-top:10px; }
+  .route-step { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .route-step:last-child { border-bottom:none; }
+  .route-num { flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+  .route-body { flex:1; }
+  .route-title { font-weight:700; font-size:13px; color:var(--navy); }
+  .route-desc { font-size:11.5px; color:var(--dark2); margin-top:3px; line-height:1.6; }
+
+  .check-grid { display:flex; gap:14px; margin-top:8px; }
+  .check-col { flex:1; background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  .check-col h3 { font-size:13px; color:var(--navy); margin:0 0 8px 0; }
+  .check-list { list-style:none; margin:0; padding:0; }
+  .check-list li { font-size:11.5px; color:var(--dark2); line-height:1.9; padding-left:22px; position:relative; }
+  .check-list li::before { content:"☐"; position:absolute; left:0; color:var(--accent); font-size:13px; }
+
+  .tip-box { background:#F2EEE3; border-left:4px solid var(--accent); border-radius:4px; padding:10px 14px; font-size:11.5px; color:var(--dark2); line-height:1.7; margin-top:12px; }
+
+  .footer { margin-top:16px; padding-top:8px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-end; gap:12px; }
+  .sources { font-size:9.5px; color:var(--grey); line-height:1.5; }
+  .sources a { color:var(--grey); }
+  .pageno { font-size:10.5px; color:var(--grey); white-space:nowrap; }
+
+  @media (max-width: 700px) {
+    body { padding:8px; }
+    .page { min-height:auto; padding:5mm 4mm 4mm 4mm; margin:0 auto 16px auto; border-radius:4px; }
+    .header { flex-wrap:wrap; margin:-5mm -4mm 0 -4mm; padding:4mm; gap:10px; }
+    .badge { width:56px; height:56px; }
+    .badge-label { font-size:10px; }
+    .badge-rank { font-size:16px; }
+    .title-block h1 { font-size:19px; }
+    .subtitle { font-size:11.5px; }
+    .score-box { min-width:0; padding:8px 14px; }
+    .score-box-value { font-size:20px; }
+    .score-cards { flex-wrap:wrap; }
+    .score-card { flex:1 1 calc(50% - 5px); min-width:130px; }
+    .axis-grid { flex-wrap:wrap; }
+    .axis-card { flex:1 1 calc(50% - 5px); min-width:130px; }
+    .leaflet-map { height:260px; }
+    .area-grid, .point-grid { grid-template-columns:1fr; }
+    .nearby-grid { flex-direction:column; }
+    .check-grid { flex-direction:column; }
+    .footer { flex-direction:column; align-items:flex-start; gap:6px; }
+  }
+
+  @media print {
+    body { background:#fff; padding:0; }
+    .page { box-shadow:none; margin:0; page-break-after: always; width:auto; max-width:none; min-height:auto; }
+  }
+</style>
+</head>
+<body>
+
+  <section class="page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>品川シーサイド 現地下見パンフレット</h1>
+        <div class="subtitle">子育て移住先スコアリング調査（全129件中 総合3位・21点）をもとにした、品川シーサイド周辺 特化版</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">総合順位</div>
+        <div class="score-box-value" style="font-size:18px;">129件中<br>3位</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ このパンフレットについて</h2>
+    <p class="summary">「子育て移住 探索パンフレット TOP10」「子育て移住 居住候補エリア・パンフレット TOP10」の2資料から、品川シーサイド駅とその周辺（東品川・南品川・北品川・勝島）に関する内容を抜き出し、現地下見用にまとめ直したものです。あわせて、同じ品川区内で近接する大井町・天王洲アイル・旗の台の3エリアも参考情報として掲載しています。</p>
+
+    <h2 class="section-title">■ 掲載内容</h2>
+    <div class="axis-grid">
+        <div class="axis-card">
+          <div class="axis-title">2. 地区概要とスコア</div>
+          <div class="axis-desc">品川シーサイドの総合評価・重み付けスコアの内訳。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">3. 探索ポイント地図</div>
+          <div class="axis-desc">駅周辺で実際に立ち寄りたい5カ所（公園・商業施設・保育園）を地図付きで紹介。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">4. 居住候補エリア地図</div>
+          <div class="axis-desc">駅からの徒歩圏を5エリアに分け、街並み・家賃感・保育状況を比較。</div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title">5〜6. 周辺エリア／当日チェックリスト</div>
+          <div class="axis-desc">大井町・天王洲アイル・旗の台との比較と、下見当日に確認したい項目。</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ 品川シーサイドの強み・注意点（サマリー）</h2>
+    <p class="summary">りんかい線沿線の再開発エリアで、駅直結の大型商業施設とタワーマンション群、海沿いの公園が特徴。品川区は待機児童ゼロを継続しており、タワー内保育園を含め保育の選択肢も豊富です。通勤利便性（新木場・田町方面）は高水準ですが、家賃はやや高め（駅前タワー物件は22〜26万円程度）で、予算とのバランス確認が下見の重要ポイントになります。</p>
+
+    <div class="tip-box">この資料の位置・徒歩時分・家賃感は元データ（候補駅評価_子育て移住先スコアリング_v13.xlsx）および各種不動産・自治体サイトに基づく参考値です。現地確認・最新情報の確認と合わせてご利用ください。</div>
+
+    <div class="footer">
+      <div class="sources">元データ：候補駅評価_子育て移住先スコアリング_v13.xlsx／子育て移住 探索パンフレット TOP10／子育て移住 居住候補エリア・パンフレット TOP10</div>
+      <div class="pageno">1/6　品川シーサイド 現地下見パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="badge"><span class="badge-label">総合</span><span class="badge-rank">3位</span></div>
+      <div class="title-block">
+        <h1>品川シーサイド</h1>
+        <div class="subtitle">東京都品川区　｜　りんかい線</div>
+      </div>
+      <div class="score-box">
+        <div class="score-box-label">重み付けスコア（22点満点）</div>
+        <div class="score-box-value">21 点</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ 地区概要</h2>
+    <p class="summary">りんかい線沿線の再開発エリア。駅直結の大型商業施設とタワーマンション群、海沿いの公園が特徴的な近未来的な街並みです。品川区は待機児童ゼロを継続しており、タワー内保育園を含め保育の選択肢も豊富。家賃はやや高めですが、通勤利便性の高さが光ります。</p>
+
+    <div class="score-cards">
+        <div class="score-card">
+          <div class="score-title">保育所充実度 ×2</div>
+          <div class="score-body">待機児童ゼロ継続</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">子育てコミュニティ施策 ×2</div>
+          <div class="score-body">◎ 品川区共通の子育て施策。大規模マンション・タワーが多いエリア</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">家賃適合度 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:67%"></div></div>
+          <div class="score-body">約22〜26万円（ギリギリ〜やや不可）</div>
+        </div>
+        <div class="score-card">
+          <div class="score-title">通勤時間 ×1</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <div class="score-body">18分／13分（新木場・田町方面）</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">■ スコアの根拠（重み付けの考え方）</h2>
+    <p class="summary">「保育所充実度」と「子育てコミュニティ施策」の重みを2倍にし、「家賃適合度」「通勤時間」は通常の1倍に抑えた重み付けスコアリングです（22点満点）。多少家賃が高い・通勤が長くても、計画的に整備された子育て環境を重視する方向けの並び替えとなっています。</p>
+
+    <h2 class="section-title">■ 周辺の品川区内ライバルエリア（参考）</h2>
+    <p class="summary">同じ品川区では、大井町（4位・21点）、天王洲アイル（5位・21点）、旗の台（6位・21点）も上位に入っており、どちらもりんかい線・大井町線で品川シーサイドから数分〜十数分の距離です。詳しくは5ページ目で比較しています。</p>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/kodomo-hoyou/kodomo-hoyou-hoikuen/index.html" target="_blank" rel="noopener">品川区公式「保育園」</a></div>
+      <div class="pageno">2/6　品川シーサイド 現地下見パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>探索ポイント地図</h1>
+        <div class="subtitle">品川シーサイド駅　｜　現地で立ち寄りたい5カ所</div>
+      </div>
+    </div>
+
+    <p class="summary">駅（紺色のピン）を中心に、カテゴリ別に色分けした番号ピンで探索ポイントを表示しています。ピンをクリックすると詳細とGoogleマップへのリンクが開きます。</p>
+    <div class="legend-grid">
+        <div class="legend-item"><span class="legend-swatch" style="background:#2E9E5B"></span>公園・緑地</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#E8935C"></span>保育・子育て支援</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#8E5FB0"></span>商業・生活利便</div>
+    </div>
+
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-1" class="leaflet-map" data-station='{"name": "品川シーサイド駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6097199, 139.7498775]}' data-points='[{"num": 1, "name": "イオンスタイル品川シーサイド", "desc": "2階に赤ちゃん休憩室（授乳スペース・オムツ交換台）があり外出時も安心。", "cat": "shopping", "link": "https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6097199, 139.7498775]}, {"num": 2, "name": "品川シーサイド公園", "desc": "タワーマンション街に隣接する身近な公園。ジャングルジムや滑り台などの遊具あり。", "cat": "park", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D4-12-13", "coord": [35.6078107, 139.7492555]}, {"num": 3, "name": "東品川海上公園", "desc": "クジラ型の滑り台やジャブジャブ池がある水辺の公園。散歩・お出かけに最適。", "cat": "park", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E5%93%81%E5%B7%9D%E6%B5%B7%E4%B8%8A%E5%85%AC%E5%9C%92%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6184434, 139.7493105]}, {"num": 4, "name": "大井ふ頭中央海浜公園", "desc": "広大な海浜公園。芝生広場やスポーツ施設もあり、のびのび過ごせる。最寄りは大井競馬場前駅（徒歩7分）で、品川シーサイド駅からはやや距離あり。", "cat": "park", "link": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%BA%95%E3%81%B5%E9%A0%AD%E4%B8%AD%E5%A4%AE%E6%B5%B7%E6%B5%9C%E5%85%AC%E5%9C%92%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6097199, 139.7498775]}, {"num": 5, "name": "認可保育園（まなびの森・ほっぺるランド等）", "desc": "タワー内保育園を含め選択肢が豊富。", "cat": "nursery", "link": "https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6097199, 139.7498775]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">品川シーサイド駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ ピンの位置はあらかじめ調査・確認した座標を埋め込んでいます。位置がずれる場合は各ポイントの「Googleマップで開く」リンクでご確認ください。</div>
+        </div>
+      </div>
+
+      <div class="point-grid">
+        <div class="point-card">
+          <div class="point-card-head">
+            <div class="point-num" style="background:#8E5FB0">1</div>
+            <div class="point-head-text">
+              <div class="point-name">イオンスタイル品川シーサイド</div>
+              <div class="point-cat" style="color:#8E5FB0">商業・生活利便</div>
+            </div>
+          </div>
+          <div class="point-desc">2階に赤ちゃん休憩室（授乳スペース・オムツ交換台）があり外出時も安心。</div>
+          <div class="point-foot">
+            <span class="point-walk">アクセス目安：徒歩2分</span>
+            <a class="point-link" href="https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="point-card">
+          <div class="point-card-head">
+            <div class="point-num" style="background:#2E9E5B">2</div>
+            <div class="point-head-text">
+              <div class="point-name">品川シーサイド公園</div>
+              <div class="point-cat" style="color:#2E9E5B">公園・緑地</div>
+            </div>
+          </div>
+          <div class="point-desc">タワーマンション街に隣接する身近な公園。ジャングルジムや滑り台などの遊具あり。</div>
+          <div class="point-foot">
+            <span class="point-walk">アクセス目安：徒歩2分</span>
+            <a class="point-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D4-12-13" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="point-card">
+          <div class="point-card-head">
+            <div class="point-num" style="background:#2E9E5B">3</div>
+            <div class="point-head-text">
+              <div class="point-name">東品川海上公園</div>
+              <div class="point-cat" style="color:#2E9E5B">公園・緑地</div>
+            </div>
+          </div>
+          <div class="point-desc">クジラ型の滑り台やジャブジャブ池がある水辺の公園。散歩・お出かけに最適。</div>
+          <div class="point-foot">
+            <span class="point-walk">アクセス目安：徒歩6〜8分</span>
+            <a class="point-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E5%93%81%E5%B7%9D%E6%B5%B7%E4%B8%8A%E5%85%AC%E5%9C%92%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="point-card">
+          <div class="point-card-head">
+            <div class="point-num" style="background:#2E9E5B">4</div>
+            <div class="point-head-text">
+              <div class="point-name">大井ふ頭中央海浜公園</div>
+              <div class="point-cat" style="color:#2E9E5B">公園・緑地</div>
+            </div>
+          </div>
+          <div class="point-desc">広大な海浜公園。芝生広場やスポーツ施設もあり、のびのび過ごせる。最寄りは大井競馬場前駅（徒歩7分）で、品川シーサイド駅からはやや距離あり。</div>
+          <div class="point-foot">
+            <span class="point-walk">アクセス目安：大井競馬場前駅から徒歩7分</span>
+            <a class="point-link" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%BA%95%E3%81%B5%E9%A0%AD%E4%B8%AD%E5%A4%AE%E6%B5%B7%E6%B5%9C%E5%85%AC%E5%9C%92%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="point-card">
+          <div class="point-card-head">
+            <div class="point-num" style="background:#E8935C">5</div>
+            <div class="point-head-text">
+              <div class="point-name">認可保育園（まなびの森・ほっぺるランド等）</div>
+              <div class="point-cat" style="color:#E8935C">保育・子育て支援</div>
+            </div>
+          </div>
+          <div class="point-desc">タワー内保育園を含め選択肢が豊富。</div>
+          <div class="point-foot">
+            <span class="point-walk">アクセス目安：徒歩3〜7分</span>
+            <a class="point-link" href="https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：候補駅評価_子育て移住先スコアリング_v13.xlsx</div>
+      <div class="pageno">3/6　品川シーサイド 現地下見パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>居住候補エリア地図</h1>
+        <div class="subtitle">品川シーサイド駅　｜　駅からの徒歩圏を5エリアで比較</div>
+      </div>
+    </div>
+
+    <p class="summary">駅前のタワーマンションエリアから、下町の雰囲気が残る南品川・北品川、公園に囲まれた勝島まで、同じ最寄駅でも街の性格が大きく異なります。下見では複数エリアを歩き比べることをおすすめします。</p>
+
+    <div class="explore">
+      <div class="map-full-wrap">
+        <div id="map-2" class="leaflet-map" data-station='{"name": "品川シーサイド駅", "link": "https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA", "coord": [35.6097199, 139.7498775]}' data-points='[{"num": 1, "name": "東品川四丁目", "desc": "駅から徒歩1〜5分", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E5%9B%9B%E4%B8%81%E7%9B%AE", "coord": [35.6095108, 139.7486177]}, {"num": 2, "name": "東品川二丁目", "desc": "駅から徒歩5〜10分（目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%BA%8C%E4%B8%81%E7%9B%AE", "coord": [35.6215645, 139.7503075]}, {"num": 3, "name": "南品川三丁目・五丁目", "desc": "駅から徒歩10〜13分（京急本線青物横丁駅までは徒歩約11分）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8D%97%E5%93%81%E5%B7%9D%E4%B8%89%E4%B8%81%E7%9B%AE", "coord": [35.6087868, 139.7439037]}, {"num": 4, "name": "北品川一丁目周辺（旧東海道沿い）", "desc": "駅から徒歩約16分（京急本線・新馬場駅経由なら公共交通で短縮可、目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8C%97%E5%93%81%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.6222567, 139.7401017]}, {"num": 5, "name": "勝島一丁目", "desc": "駅から徒歩15分超（公共交通利用可。京急本線立会川駅からのアクセスも可能、目安）", "link": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8B%9D%E5%B3%B6%E4%B8%80%E4%B8%81%E7%9B%AE", "coord": [35.599285, 139.745155]}]'>
+          <div class="map-loading">地図を読み込み中…</div>
+        </div>
+        <div class="map-foot">
+          <a class="map-open" href="https://www.google.com/maps/search/?api=1&query=%E5%93%81%E5%B7%9D%E3%82%B7%E3%83%BC%E3%82%B5%E3%82%A4%E3%83%89%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">品川シーサイド駅 周辺をGoogleマップで開く ↗</a>
+          <div class="map-note">※ 家賃・物件数の数値は出典のあるものに限り記載し、それ以外は定性表現です。物件数は町丁目単位で絞り込めない場合、同じ町名内の複数丁目で同一の参考値になっています。</div>
+        </div>
+      </div>
+
+      <div class="area-grid">
+        <div class="area-card">
+          <div class="area-card-head">
+            <span class="area-num">1</span>
+            <div class="area-head-text">
+              <div class="area-name">東品川四丁目</div>
+              <div class="area-dist">駅から徒歩1〜5分</div>
+            </div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>駅直結の複合施設「品川シーサイドフォレスト」（イオンスタイル等が入る「オーバルガーデン」を含む）を中心に、企業ビルと高層マンションが林立する計画的な再開発エリア。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前の高層マンションは品川シーサイド駅周辺では高めの部類。駅周辺平均は約19.7万円、1LDK目安15.6万円というデータあり（HOME'S調べ）で、駅直結物件はこの上限に近い水準とみられる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>品川区立東品川保育園やアンジェリカ保育園東品川保育園など複数の認可保育園が立地。東品川公園など駅近の公園も散歩動線として利用できる。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点。認可等195施設。）</span></div>
+          </div>
+          <div class="area-foot">
+            <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E5%9B%9B%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="area-card">
+          <div class="area-card-head">
+            <span class="area-num">2</span>
+            <div class="area-head-text">
+              <div class="area-name">東品川二丁目</div>
+              <div class="area-dist">駅から徒歩5〜10分（目安）</div>
+            </div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>天王洲アイル方面に近い運河沿いのエリア。倉庫を活用したオフィス・アート施設と住宅が混在し、駅前の高層エリアよりやや落ち着いた街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅前タワーエリアよりやや抑えめの水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>東品川公園・しながわ区民公園方面へのアクセスが良く、区立東品川保育園の通園圏内。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点）</span></div>
+          </div>
+          <div class="area-foot">
+            <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E6%9D%B1%E5%93%81%E5%B7%9D%E4%BA%8C%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="area-card">
+          <div class="area-card-head">
+            <span class="area-num">3</span>
+            <div class="area-head-text">
+              <div class="area-name">南品川三丁目・五丁目</div>
+              <div class="area-dist">駅から徒歩10〜13分（青物横丁駅までは徒歩約11分）</div>
+            </div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>京急線・青物横丁駅寄りのエリアで、下町的な商店街や低層住宅が残るゾーン。駅前の再開発エリアとは対照的に、昔ながらの生活感のある街並み。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>青物横丁寄りは駅前より家賃を抑えられる傾向があるとの記述あり（定性情報）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>認可保育園「ルーチェ保育園南品川」（青物横丁駅徒歩2分）、「太陽の子南品川保育園」など複数の保育施設が徒歩圏。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点）</span></div>
+          </div>
+          <div class="area-foot">
+            <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8D%97%E5%93%81%E5%B7%9D%E4%B8%89%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="area-card">
+          <div class="area-card-head">
+            <span class="area-num">4</span>
+            <div class="area-head-text">
+              <div class="area-name">北品川一丁目周辺（旧東海道沿い）</div>
+              <div class="area-dist">駅から徒歩約16分（新馬場駅経由なら短縮可、目安）</div>
+            </div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>旧東海道の宿場町の面影が残る商店街エリア。低層の町家的建物と昔ながらの商店が並び、再開発ゾーンとは全く異なる下町の風情。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>再開発タワーエリアと比べ低層物件が中心で、家賃は駅前より控えめな傾向と考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>京急新馬場駅・北品川駅を介した子育て動線となり、旧東海道の散歩道は日常の外遊びルートにもなり得る。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点）</span></div>
+          </div>
+          <div class="area-foot">
+            <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8C%97%E5%93%81%E5%B7%9D%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+
+        <div class="area-card">
+          <div class="area-card-head">
+            <span class="area-num">5</span>
+            <div class="area-head-text">
+              <div class="area-name">勝島一丁目</div>
+              <div class="area-dist">駅から徒歩15分超（立会川駅からのアクセスも可能、目安）</div>
+            </div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#5B7FA6" title="街並み・住環境">街</span>
+            <div class="fact-text"><span class="fact-label">街並み・住環境</span>しながわ区民公園に隣接する、中層の集合住宅（団地含む）が中心のエリア。駅前の高層タワーエリアとは異なり、公園に囲まれたファミリー向けの落ち着いた住環境。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#C9973E" title="家賃相場感">¥</span>
+            <div class="fact-text"><span class="fact-label">家賃相場感</span>駅からやや距離があるため、駅前平均（約19.7万円）より抑えめの水準になりやすいと考えられる（定性表現）。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#3E9B6F" title="子育て動線">子</span>
+            <div class="fact-text"><span class="fact-label">子育て動線</span>認可保育園「にじいろ保育園勝島」が品川区民公園内に立地し、しながわ区民公園という大規模な公園が徒歩圏にあるため、外遊び・散歩の動線が豊富。</div>
+          </div>
+          <div class="area-fact">
+            <span class="fact-icon" style="background:#B0553E" title="保育園入園状況">入</span>
+            <div class="fact-text"><span class="fact-label">保育園入園状況（区単位）</span>入園決定率83.3%・待機児童ゼロ<span class="fact-sub">（令和6年度4月時点）</span></div>
+          </div>
+          <div class="area-foot">
+            <a class="area-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA%E5%8B%9D%E5%B3%B6%E4%B8%80%E4%B8%81%E7%9B%AE" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.homes.co.jp/chintai/tokyo/shinagawaseaside_09833-st/price/" target="_blank" rel="noopener">HOME'S（家賃相場）</a>　／　<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/kodomo-hoyou/kodomo-hoyou-hoikuen/index.html" target="_blank" rel="noopener">品川区公式「保育園」</a>　／　<a href="https://shinagawa-kanko.or.jp/featured/20180520/" target="_blank" rel="noopener">品川区観光協会</a></div>
+      <div class="pageno">4/6　品川シーサイド 現地下見パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>周辺エリアも合わせてチェック</h1>
+        <div class="subtitle">品川シーサイドから電車数分〜十数分の品川区内ライバル候補</div>
+      </div>
+    </div>
+
+    <p class="summary">下見の当日、時間に余裕があれば以下の3エリアも足を延ばして比較すると、街の性格の違いがより分かりやすくなります。いずれも品川区内で待機児童ゼロが続いている点は共通です。</p>
+
+    <div class="nearby-grid">
+      <div class="nearby-card">
+        <div class="nearby-head">
+          <span class="nearby-name">大井町</span>
+          <span class="nearby-rank">総合4位・21点</span>
+        </div>
+        <div class="nearby-line">JR京浜東北線／りんかい線／東急大井町線</div>
+        <div class="nearby-desc">3路線が交わるターミナル駅。2026年3月開業の複合再開発「OIMACHI TRACKS」がしながわ中央公園・新区庁舎とペデストリアンデッキで一体的に整備され、防災広場も備えた計画的な街区へ。商業施設も充実。</div>
+        <div class="nearby-from">品川シーサイドから：りんかい線で隣駅（約2分）</div>
+        <a class="nearby-link" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%BA%95%E7%94%BA%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+      </div>
+
+      <div class="nearby-card">
+        <div class="nearby-head">
+          <span class="nearby-name">天王洲アイル</span>
+          <span class="nearby-rank">総合5位・21点</span>
+        </div>
+        <div class="nearby-line">東京モノレール／りんかい線</div>
+        <div class="nearby-desc">運河沿いのウォーターフロントエリア。アートとカフェが集まる「TENNOZ ISLE」や総延長2.5kmの緑道公園が広がる。2026年4月「品川区こども計画」策定、幼保一体施設・すまいるスクールなど支援体制も充実。</div>
+        <div class="nearby-from">品川シーサイドから：りんかい線で隣駅（約2分）</div>
+        <a class="nearby-link" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%A9%E7%8E%8B%E6%B4%B2%E3%82%A2%E3%82%A4%E3%83%AB%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+      </div>
+
+      <div class="nearby-card">
+        <div class="nearby-head">
+          <span class="nearby-name">旗の台</span>
+          <span class="nearby-rank">総合6位・21点</span>
+        </div>
+        <div class="nearby-line">東急大井町線／東急池上線</div>
+        <div class="nearby-desc">東急大井町線と池上線が交わる、7つの商店街を抱える下町的な駅。品川区の待機児童10年連続ゼロ・子育てランキング1位の実績。駅前に昭和大学病院（小児医療含む総合病院）があり医療アクセスも良好。</div>
+        <div class="nearby-from">品川シーサイドから：大井町乗換・大井町線で約15〜20分</div>
+        <a class="nearby-link" href="https://www.google.com/maps/search/?api=1&query=%E6%97%97%E3%81%AE%E5%8F%B0%E9%A7%85%20%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%93%81%E5%B7%9D%E5%8C%BA" target="_blank" rel="noopener">Googleマップで開く ↗</a>
+      </div>
+    </div>
+
+    <div class="tip-box">品川シーサイド・天王洲アイル・大井町はいずれもりんかい線一本でつながっているため、1日の下見で3エリアを続けて回りやすいのが強みです。旗の台は少し離れているため、時間に余裕がある場合の「+1候補」として位置づけるのがおすすめです。</div>
+
+    <div class="footer">
+      <div class="sources">出典：<a href="https://www.city.shinagawa.tokyo.jp/PC/kodomo/20250408102519.html" target="_blank" rel="noopener">品川区公式「品川区こども計画」</a>　／　<a href="https://www.s-navi.jp/blog/detail?id=21" target="_blank" rel="noopener">住まいソリューション（OIMACHI TRACKS）</a></div>
+      <div class="pageno">5/6　品川シーサイド 現地下見パンフレット</div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header">
+      <div class="title-block" style="flex:1 1 auto;">
+        <h1>下見当日チェックリスト</h1>
+        <div class="subtitle">品川シーサイド周辺を効率よく歩くためのガイド</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ おすすめの回り方（1日で歩く場合の一例）</h2>
+    <div class="route-timeline">
+      <div class="route-step">
+        <div class="route-num">1</div>
+        <div class="route-body">
+          <div class="route-title">品川シーサイド駅に到着</div>
+          <div class="route-desc">まずはイオンスタイル品川シーサイド（徒歩2分）と品川シーサイド公園（徒歩2分）で、駅直結エリアの雰囲気と赤ちゃん休憩室・遊具の様子を確認。</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-num">2</div>
+        <div class="route-body">
+          <div class="route-title">東品川四丁目（駅前タワーエリア）を歩く</div>
+          <div class="route-desc">再開発された街区の道幅・ベビーカー動線・保育園の位置を確認。</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-num">3</div>
+        <div class="route-body">
+          <div class="route-title">東品川海上公園へ（徒歩6〜8分）</div>
+          <div class="route-desc">クジラ型滑り台などの遊具を確認しつつ、東品川二丁目の運河沿いエリアも合わせて見る。</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-num">4</div>
+        <div class="route-body">
+          <div class="route-title">南品川三丁目・五丁目 〜 北品川一丁目（旧東海道沿い）</div>
+          <div class="route-desc">徒歩10分強。下町の商店街エリアを歩き、駅前の再開発ゾーンとの雰囲気の違いを体感する。</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-num">5</div>
+        <div class="route-body">
+          <div class="route-title">（余力があれば）大井町・天王洲アイルへ</div>
+          <div class="route-desc">りんかい線で1駅ずつ。OIMACHI TRACKSの再開発の様子や、天王洲の運河沿い緑道もあわせて見ておくと比較材料が増える。</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">■ チェックリスト</h2>
+    <div class="check-grid">
+      <div class="check-col">
+        <h3>現地で確認したいこと</h3>
+        <ul class="check-list">
+          <li>保育園・幼稚園の見学可否（訪問前に電話予約が必要な場合が多い）</li>
+          <li>公園の日当たり・遊具の対象年齢・ベンチや日陰の有無</li>
+          <li>イオンスタイル等の価格帯・混雑具合・ベビーカー入店のしやすさ</li>
+          <li>駅ホームまでの動線（エレベーター・エスカレーターの有無）</li>
+          <li>タワーエリアと下町エリア、それぞれの人通り・雰囲気の違い</li>
+          <li>できれば夕方〜夜も一度歩いて、街灯・人通りを確認</li>
+          <li>スーパー・ドラッグストア・小児科など生活インフラの位置</li>
+        </ul>
+      </div>
+      <div class="check-col">
+        <h3>持ち物・事前準備</h3>
+        <ul class="check-list">
+          <li>歩きやすい靴（1日でかなり歩く想定）</li>
+          <li>帽子・日傘・飲み物（真夏は熱中症対策を優先）</li>
+          <li>モバイルバッテリー</li>
+          <li>このパンフレット（オフラインでも見られるよう保存）</li>
+          <li>気になった物件・保育園はその場で写真・メモを残す</li>
+          <li>当日の天気予報は前日に改めて確認</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tip-box">品川シーサイド駅周辺は海が近く日差しを遮るものが少ないエリアです。特に夏場の下見は、水分補給できるカフェや商業施設（イオンスタイル等）の場所を先に把握しておくと動きやすくなります。</div>
+
+    <div class="footer">
+      <div class="sources">元データ：子育て移住 探索パンフレット TOP10／子育て移住 居住候補エリア・パンフレット TOP10</div>
+      <div class="pageno">6/6　品川シーサイド 現地下見パンフレット</div>
+    </div>
+  </section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function() {
+  var CAT_COLOR = {"park": "#2E9E5B", "nursery": "#E8935C", "community": "#3E7CB1", "shopping": "#8E5FB0", "redevelop": "#D1495B"};
+
+  function makeIcon(html, className, size) {
+    return L.divIcon({ className: className, html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] });
+  }
+
+  function initMap(containerId) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    var station, points;
+    try {
+      station = JSON.parse(el.getAttribute("data-station"));
+      points = JSON.parse(el.getAttribute("data-points"));
+    } catch (e) {
+      el.textContent = "地図データの読み込みに失敗しました。各ポイントの「Googleマップで開く」リンクをご利用ください。";
+      return;
+    }
+    el.innerHTML = "";
+
+    var map = L.map(containerId, { scrollWheelZoom: false }).setView(station.coord, 15);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var bounds = [station.coord];
+    var stationIcon = makeIcon('<div class="pin station-pin"><span>駅</span></div>', "", 30);
+    L.marker(station.coord, { icon: stationIcon }).addTo(map)
+      .bindPopup("<b>" + station.name + "</b><br><a href='" + station.link + "' target='_blank' rel='noopener'>Googleマップで開く</a>");
+
+    points.forEach(function(p) {
+      if (!p.coord) { return; }
+      bounds.push(p.coord);
+      var color = CAT_COLOR[p.cat] || "#2E7D6B";
+      var icon = makeIcon('<div class="pin" style="background:' + color + '"><span>' + p.num + '</span></div>', "", 26);
+      L.marker(p.coord, { icon: icon }).addTo(map)
+        .bindPopup("<b>" + p.name + "</b><br>" + p.desc + "<br><a href='" + p.link + "' target='_blank' rel='noopener'>Googleマップで開く</a>");
+    });
+
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+    setTimeout(function() { map.invalidateSize(); }, 200);
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".leaflet-map").forEach(function(el) { initMap(el.id); });
+  });
+})();
+</script>
+</body>
+</html>

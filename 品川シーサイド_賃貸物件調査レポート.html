@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>品川シーサイド 賃貸物件調査レポート</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --main-green:#2e7d5b;
+    --main-green-dark:#1f5c41;
+    --accent:#e8734a;
+    --bg:#f7f6f2;
+    --card-bg:#ffffff;
+    --text:#2b2b2b;
+    --muted:#6b6b6b;
+    --border:#e2ded4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+  }
+  header{
+    background:linear-gradient(135deg,var(--main-green-dark),var(--main-green));
+    color:#fff;
+    padding:36px 24px 28px;
+  }
+  header .inner{max-width:1100px;margin:0 auto;}
+  header h1{margin:0 0 8px;font-size:26px;letter-spacing:.02em;}
+  header p{margin:4px 0;font-size:14px;opacity:.92;}
+  .container{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+  section{margin-bottom:40px;}
+  h2{
+    font-size:19px;
+    border-left:5px solid var(--main-green);
+    padding-left:10px;
+    margin:0 0 16px;
+    color:var(--main-green-dark);
+  }
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px;
+    margin-bottom:8px;
+  }
+  .summary-card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+  }
+  .summary-card .label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+  .summary-card .value{font-size:20px;font-weight:700;color:var(--main-green-dark);}
+  .summary-card .sub{font-size:12px;color:var(--muted);margin-top:4px;}
+  .note-box{
+    background:#fff8ec;
+    border:1px solid #ecd9a8;
+    border-radius:10px;
+    padding:14px 18px;
+    font-size:13.5px;
+    color:#6b5227;
+    margin-top:14px;
+  }
+  #map{
+    height:480px;
+    width:100%;
+    border-radius:12px;
+    border:1px solid var(--border);
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:12px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card-bg);
+    border-radius:10px;
+    overflow:hidden;
+    font-size:13.5px;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+  }
+  thead th{
+    background:var(--main-green-dark);
+    color:#fff;
+    text-align:left;
+    padding:10px 10px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:10px 10px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#f4f8f5;}
+  .badge{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+    color:#fff;
+  }
+  .badge.ok{background:var(--main-green);}
+  .badge.over{background:var(--accent);}
+  .badge.teiki{background:#9a6b3e;margin-left:4px;}
+  .num{font-weight:700;color:var(--main-green-dark);}
+  .table-wrap{overflow-x:auto;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+  .pcard{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .pcard h3{margin:0 0 6px;font-size:15.5px;color:var(--main-green-dark);}
+  .pcard .price{font-size:22px;font-weight:800;color:var(--accent);margin:4px 0 8px;}
+  .pcard .price small{font-size:12px;font-weight:500;color:var(--muted);}
+  .pcard dl{margin:0;font-size:13px;}
+  .pcard dl div{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--border);}
+  .pcard dl div:last-child{border-bottom:none;}
+  .pcard dl dt{color:var(--muted);}
+  .pcard dl dd{margin:0;text-align:right;}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    padding:20px;
+  }
+  .source-note{font-size:12px;color:var(--muted);margin-top:10px;}
+  a{color:var(--main-green-dark);}
+  table a{white-space:nowrap;font-weight:600;}
+  .pcard dl a{font-weight:600;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1>品川シーサイド 賃貸物件調査レポート</h1>
+    <p>対象エリア：東京都品川区 品川シーサイド駅（りんかい線）周辺　｜　条件：家賃・管理費込み 25万円程度／2LDK以上</p>
+    <p>作成日：2026年8月9日</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <section>
+    <h2>エリア概況</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">田町駅までの所要時間</div>
+        <div class="value">約19〜20分</div>
+        <div class="sub">乗換1回（大井町 or 大崎経由）</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">新木場駅までの所要時間</div>
+        <div class="value">約13〜14分</div>
+        <div class="sub">りんかい線・乗換なし</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">今回抽出した物件数</div>
+        <div class="value">8件</div>
+        <div class="sub">2LDK以上・SUUMO掲載物件より厳選</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">家賃+管理費のレンジ</div>
+        <div class="value">17.9万〜26.4万円</div>
+        <div class="sub">予算25万円ラインを基準に一覧化</div>
+      </div>
+    </div>
+    <div class="note-box">
+      品川シーサイド駅は、田町・新木場の両方に対して好条件（田町 約19分・乗換1回／新木場 約14分・乗換なし）で、これまでの候補駅調査（候補駅一覧）でリストアップされていた駅よりもさらに好立地です。特に新木場へは乗換なしの直通で、通勤負担が小さい点が強みです。（2026年8月9日、Yahoo!乗換案内で平日朝8:00発ベースで確認）
+    </div>
+  </section>
+
+  <section>
+    <h2>物件マップ</h2>
+    <div id="map"></div>
+    <div class="legend">
+      <span><span class="dot" style="background:#2e7d5b;"></span>予算内（25万円以内）</span>
+      <span><span class="dot" style="background:#e8734a;"></span>予算やや超過（参考物件）</span>
+      <span><span class="dot" style="background:#1f5c41;border:2px solid #fff;box-shadow:0 0 0 1px #1f5c41;"></span>品川シーサイド駅</span>
+    </div>
+    <p class="source-note">※地図上のピンは町丁目レベルの概算位置です。内見前に必ずSUUMO詳細ページや現地地図で正確な所在地をご確認ください。</p>
+  </section>
+
+  <section>
+    <h2>物件一覧（家賃が安い順）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>物件名</th>
+            <th>間取り／面積</th>
+            <th>家賃</th>
+            <th>管理費</th>
+            <th>合計月額</th>
+            <th>敷/礼</th>
+            <th>築年数</th>
+            <th>品川シーサイド駅</th>
+            <th>その他最寄駅</th>
+            <th>所在地</th>
+            <th>備考</th>
+            <th>SUUMO詳細</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>大井町 2LDK</td>
+            <td>2LDK / 37.03m²</td>
+            <td>16.4万円</td>
+            <td>1.5万円</td>
+            <td class="num">17.9万円</td>
+            <td>16.4万 / -</td>
+            <td>築2年</td>
+            <td>徒歩8分</td>
+            <td>京急本線 青物横丁 徒歩5分</td>
+            <td>品川区南品川3</td>
+            <td><span class="badge ok">予算内</span> 築浅・コンパクト</td>
+            <td><a href="https://suumo.jp/chintai/bc_100517716018/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>青物横丁 2LDK</td>
+            <td>2LDK / 36.59m²</td>
+            <td>17.0万円</td>
+            <td>1.5万円</td>
+            <td class="num">18.5万円</td>
+            <td>17.0万 / -</td>
+            <td>築2年</td>
+            <td>徒歩8分</td>
+            <td>京急本線 青物横丁 徒歩5分</td>
+            <td>品川区南品川3</td>
+            <td><span class="badge ok">予算内</span> 上記と同エリア・築浅</td>
+            <td><a href="https://suumo.jp/chintai/bc_100514069482/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>南品川2丁目貸家</td>
+            <td>2LDK / 61.77m²（一戸建て）</td>
+            <td>19.8万円</td>
+            <td>1.0万円</td>
+            <td class="num">20.8万円</td>
+            <td>19.8万 / 19.8万</td>
+            <td>築36年</td>
+            <td>徒歩13分</td>
+            <td>京急本線 新馬場 徒歩5分</td>
+            <td>品川区南品川2</td>
+            <td><span class="badge ok">予算内</span> 戸建て・広め</td>
+            <td><a href="https://suumo.jp/chintai/bc_100517031300/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>アイビハイツ南品川</td>
+            <td>2LDK / 62.29m²</td>
+            <td>20.0万円</td>
+            <td>-</td>
+            <td class="num">20.0万円</td>
+            <td>20.0万 / 20.0万</td>
+            <td>築43年</td>
+            <td>徒歩6分</td>
+            <td>京急本線 鮫洲 徒歩10分</td>
+            <td>品川区東大井1</td>
+            <td><span class="badge ok">予算内</span> 広め・旧耐震の可能性あり要確認</td>
+            <td><a href="https://suumo.jp/chintai/bc_100513767244/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>パークアクシス品川シーサイド（41.28m²タイプ）</td>
+            <td>2LDK / 41.28m²</td>
+            <td>20.0万円</td>
+            <td>1.5万円</td>
+            <td class="num">21.5万円</td>
+            <td>20.0万 / 10〜20万</td>
+            <td>新築</td>
+            <td>徒歩5分</td>
+            <td>京急本線 青物横丁 徒歩7分</td>
+            <td>品川区東品川4</td>
+            <td><span class="badge ok">予算内</span><span class="badge teiki">定期借家</span></td>
+            <td><a href="https://suumo.jp/chintai/bc_100520373916/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>パークアクシス品川シーサイド（41.97m²タイプ）</td>
+            <td>2LDK / 41.97m²</td>
+            <td>21.0万円</td>
+            <td>1.5万円</td>
+            <td class="num">22.5万円</td>
+            <td>21.0万 / 0〜21万</td>
+            <td>新築</td>
+            <td>徒歩5分</td>
+            <td>京急本線 青物横丁 徒歩7分</td>
+            <td>品川区東品川4</td>
+            <td><span class="badge ok">予算内</span><span class="badge teiki">定期借家</span></td>
+            <td><a href="https://suumo.jp/chintai/bc_100511666542/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>ビレッジハウス品川八潮タワー1号棟</td>
+            <td>3LDK / 64.03m²</td>
+            <td>15.5万円</td>
+            <td>-</td>
+            <td class="num">15.5万円</td>
+            <td>- / -</td>
+            <td>築42年</td>
+            <td>徒歩18分</td>
+            <td>東京モノレール 大井競馬場前 徒歩18分</td>
+            <td>品川区八潮5</td>
+            <td><span class="badge ok">予算内</span> 3LDKで最安・駅距離は要検討</td>
+            <td><a href="https://suumo.jp/chintai/bc_100517508734/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>品川シーサイドビュータワーI</td>
+            <td>2LDK / 64.06m²</td>
+            <td>24.5万円</td>
+            <td>1.9万円</td>
+            <td class="num">26.4万円</td>
+            <td>- / 49万（礼金2ヶ月）</td>
+            <td>築24年</td>
+            <td>徒歩1分</td>
+            <td>京急本線 青物横丁 徒歩10〜11分</td>
+            <td>品川区東品川4</td>
+            <td><span class="badge over">予算やや超過</span> 駅直結・広め・礼金高め</td>
+            <td><a href="https://suumo.jp/chintai/bc_100520162641/" target="_blank" rel="noopener">SUUMOで見る</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="source-note">出典：SUUMO「品川シーサイド」検索結果（2026年8月9日時点、賃料25万円以下・2LDK/3LDK条件で抽出）。家賃・空室状況は変動するため、内見前に最新情報をご確認ください。</p>
+  </section>
+
+  <section>
+    <h2>物件カード（詳細）</h2>
+    <div class="cards">
+
+      <div class="pcard">
+        <h3>① 大井町 2LDK</h3>
+        <div class="price">17.9万円 <small>/ 月（家賃16.4万+管理費1.5万）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 37.03m²</dd></div>
+          <div><dt>築年数</dt><dd>築2年</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩8分</dd></div>
+          <div><dt>その他駅</dt><dd>青物横丁 徒歩5分／大井町 徒歩16分</dd></div>
+          <div><dt>所在地</dt><dd>品川区南品川3</dd></div>
+          <div><dt>敷/礼</dt><dd>16.4万円 / なし</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100517716018/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>② 青物横丁 2LDK</h3>
+        <div class="price">18.5万円 <small>/ 月（家賃17.0万+管理費1.5万）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 36.59m²</dd></div>
+          <div><dt>築年数</dt><dd>築2年</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩8分</dd></div>
+          <div><dt>その他駅</dt><dd>青物横丁 徒歩5分／大井町 徒歩16分</dd></div>
+          <div><dt>所在地</dt><dd>品川区南品川3</dd></div>
+          <div><dt>敷/礼</dt><dd>17.0万円 / なし</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100514069482/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>③ 南品川2丁目貸家</h3>
+        <div class="price">20.8万円 <small>/ 月（家賃19.8万+管理費1.0万）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 61.77m²（戸建て）</dd></div>
+          <div><dt>築年数</dt><dd>築36年</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩13分</dd></div>
+          <div><dt>その他駅</dt><dd>新馬場 徒歩5分／青物横丁 徒歩7分</dd></div>
+          <div><dt>所在地</dt><dd>品川区南品川2</dd></div>
+          <div><dt>敷/礼</dt><dd>19.8万円 / 19.8万円</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100517031300/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>④ アイビハイツ南品川</h3>
+        <div class="price">20.0万円 <small>/ 月（管理費込み）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 62.29m²</dd></div>
+          <div><dt>築年数</dt><dd>築43年（要：新耐震基準の確認）</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩6分</dd></div>
+          <div><dt>その他駅</dt><dd>鮫洲 徒歩10分／青物横丁 徒歩13分</dd></div>
+          <div><dt>所在地</dt><dd>品川区東大井1</dd></div>
+          <div><dt>敷/礼</dt><dd>20.0万円 / 20.0万円</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100513767244/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>⑤ パークアクシス品川シーサイド（41.28m²）</h3>
+        <div class="price">21.5万円 <small>/ 月（家賃20.0万+管理費1.5万）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 41.28m²</dd></div>
+          <div><dt>築年数</dt><dd>新築</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩5分</dd></div>
+          <div><dt>その他駅</dt><dd>青物横丁 徒歩7分／鮫洲 徒歩9〜10分</dd></div>
+          <div><dt>所在地</dt><dd>品川区東品川4</dd></div>
+          <div><dt>契約形態</dt><dd>定期借家（要確認）</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100520373916/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>⑥ パークアクシス品川シーサイド（41.97m²）</h3>
+        <div class="price">22.5万円 <small>/ 月（家賃21.0万+管理費1.5万）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 41.97m²</dd></div>
+          <div><dt>築年数</dt><dd>新築</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩5分</dd></div>
+          <div><dt>その他駅</dt><dd>青物横丁 徒歩7分／鮫洲 徒歩9〜10分</dd></div>
+          <div><dt>所在地</dt><dd>品川区東品川4</dd></div>
+          <div><dt>契約形態</dt><dd>定期借家（要確認）</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100511666542/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>⑦ ビレッジハウス品川八潮タワー1号棟</h3>
+        <div class="price">15.5万円 <small>/ 月（管理費表記なし）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>3LDK / 64.03m²</dd></div>
+          <div><dt>築年数</dt><dd>築42年</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩18分</dd></div>
+          <div><dt>その他駅</dt><dd>大井競馬場前 徒歩18分／鮫洲 徒歩22分</dd></div>
+          <div><dt>所在地</dt><dd>品川区八潮5</dd></div>
+          <div><dt>特徴</dt><dd>3LDKで最安。駅距離はやや遠め</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100517508734/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="pcard">
+        <h3>⑧ 品川シーサイドビュータワーI（参考・予算超過）</h3>
+        <div class="price">26.4万円 <small>/ 月（家賃24.5万+管理費1.9万）</small></div>
+        <dl>
+          <div><dt>間取り・面積</dt><dd>2LDK / 64.06m²</dd></div>
+          <div><dt>築年数</dt><dd>築24年</dd></div>
+          <div><dt>品川シーサイド駅</dt><dd>徒歩1分（駅直結クラス）</dd></div>
+          <div><dt>その他駅</dt><dd>青物横丁 徒歩10〜11分</dd></div>
+          <div><dt>所在地</dt><dd>品川区東品川4</dd></div>
+          <div><dt>敷/礼</dt><dd>なし / 49万円（礼金2ヶ月）</dd></div>
+          <div><dt>SUUMO</dt><dd><a href="https://suumo.jp/chintai/bc_100520162641/" target="_blank" rel="noopener">物件ページを見る</a></dd></div>
+        </dl>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>下見にあたっての留意点</h2>
+    <div class="note-box">
+      ・「定期借家」の物件（⑤⑥）は契約期間満了で原則退去となるため、更新の可否・再契約条件を必ず不動産会社に確認してください。<br>
+      ・築古物件（④⑦：築40年超）は1981年の新耐震基準の適用有無を要確認です。<br>
+      ・⑧は月額が予算をやや超えますが、品川シーサイド駅から徒歩1分と利便性が突出しているため、参考として掲載しています。<br>
+      ・掲載中の家賃・管理費・空室状況は日々変動します。内見前にSUUMO等で最新情報の再確認をおすすめします。
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  作成：Claude（Cowork）｜データ出典：SUUMO、Yahoo!路線情報（2026年8月9日時点）
+</footer>
+
+<script>
+  var map = L.map('map').setView([35.6089, 139.7462], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // 品川シーサイド駅
+  var stationIcon = L.divIcon({
+    className: '',
+    html: '<div style="background:#1f5c41;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.4);"></div>',
+    iconSize: [16,16],
+    iconAnchor: [8,8]
+  });
+  L.marker([35.6091, 139.7473], {icon: stationIcon})
+    .addTo(map)
+    .bindPopup('<b>品川シーサイド駅</b><br>りんかい線<br>田町まで約19分／新木場まで約14分');
+
+  function pinIcon(color){
+    return L.divIcon({
+      className: '',
+      html: '<div style="background:'+color+';width:14px;height:14px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4);"></div>',
+      iconSize: [14,14],
+      iconAnchor: [7,14]
+    });
+  }
+  var ok = '#2e7d5b';
+  var over = '#e8734a';
+
+  var properties = [
+    {name:"① 大井町 2LDK", pos:[35.6039, 139.7388], price:"17.9万円/月", detail:"2LDK 37.03m²・築2年・品川シーサイド駅徒歩8分", color: ok},
+    {name:"② 青物横丁 2LDK", pos:[35.6035, 139.7382], price:"18.5万円/月", detail:"2LDK 36.59m²・築2年・品川シーサイド駅徒歩8分", color: ok},
+    {name:"③ 南品川2丁目貸家", pos:[35.6052, 139.7391], price:"20.8万円/月", detail:"2LDK(戸建) 61.77m²・築36年・品川シーサイド駅徒歩13分", color: ok},
+    {name:"④ アイビハイツ南品川", pos:[35.6060, 139.7414], price:"20.0万円/月", detail:"2LDK 62.29m²・築43年・品川シーサイド駅徒歩6分", color: ok},
+    {name:"⑤ パークアクシス品川シーサイド(41.28m²)", pos:[35.6099, 139.7460], price:"21.5万円/月", detail:"2LDK 41.28m²・新築・品川シーサイド駅徒歩5分・定期借家", color: ok},
+    {name:"⑥ パークアクシス品川シーサイド(41.97m²)", pos:[35.6100, 139.7461], price:"22.5万円/月", detail:"2LDK 41.97m²・新築・品川シーサイド駅徒歩5分・定期借家", color: ok},
+    {name:"⑦ ビレッジハウス品川八潮タワー1号棟", pos:[35.5947, 139.7503], price:"15.5万円/月", detail:"3LDK 64.03m²・築42年・品川シーサイド駅徒歩18分", color: ok},
+    {name:"⑧ 品川シーサイドビュータワーI（参考）", pos:[35.6095, 139.7466], price:"26.4万円/月", detail:"2LDK 64.06m²・築24年・品川シーサイド駅徒歩1分", color: over}
+  ];
+
+  properties.forEach(function(p){
+    L.marker(p.pos, {icon: pinIcon(p.color)})
+      .addTo(map)
+      .bindPopup('<b>'+p.name+'</b><br>'+p.price+'<br>'+p.detail);
+  });
+</script>
+
+</body>
+</html>
